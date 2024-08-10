@@ -1,0 +1,9 @@
+{
+  "name": "davidp dot dev",
+  "short_name": "davidp",
+  "theme_color": "#FFFFFF",
+  "background_color": "#FFFFFF",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait"
+}
