@@ -2,5 +2,6 @@ module.exports = {
   extends: "next/core-web-vitals",
   rules: {
     "semi": ["error", "never"],
+    "indent": ["error", 2],
   }
 }
