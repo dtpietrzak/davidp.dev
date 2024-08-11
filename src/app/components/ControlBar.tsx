@@ -3,6 +3,7 @@
 import { useMousePosition } from "@/hooks/useMouseLocation"
 import { useToolTip } from "@/hooks/useToolTip"
 import { useWindowSize } from "@/hooks/useWindowSize"
+import { useClickAway } from "@/hooks/useClickAway"
 import { useCallback, useEffect, useState } from "react"
 
 import {  } from "react-icons/ri"
@@ -17,15 +18,24 @@ type ControlBarOptions = {
   location: 'top' | 'bottom' | 'left' | 'right'
 }
 
+const locationsArray: ControlBarOptions['location'][] = ['right', 'left', 'top', 'bottom']
+
 export const ControlBar = () => {
   const { x, y } = useMousePosition()
   const { openToolTip, closeToolTip } = useToolTip()
   const { width, height } = useWindowSize()
-
+  
   const [mouseInControlHandle, setMouseInControlHandle] = useState(false)
   const [controlBarFocused, setControlBarFocused] = useState(false)
+  const [temp, setTemp] = useState(0)
   const [location, setLocation] = 
-    useState<ControlBarOptions['location']>('right')
+  useState<ControlBarOptions['location']>(locationsArray[temp])
+  
+  const clickAwayRef = useClickAway(() => {
+    timeInControlBarHitbox = 0
+    setControlBarFocused(false)
+    setMouseInControlHandle(false)
+  })
 
   const handleControlBarFocused = useCallback((
     relativeMousePosition: number,
@@ -82,6 +92,7 @@ export const ControlBar = () => {
 
   return (
     <div 
+      ref={clickAwayRef}
       className={
         `z-40 overflow-hidden fixed transition-all ease-out bg-slate-500/30 backdrop-blur-xl border-slate-500/50 ${
           location === 'top' || location === 'bottom' ?
@@ -109,9 +120,9 @@ export const ControlBar = () => {
             // left or right
               `${controlBarFocused ? 'h-[52px]' : 'h-[48px]'}` 
           } ${
-            location === 'top' ? `top-0 right-0 border-b ${controlBarFocused ? 'rounded-bl-none w-[52px]' : 'rounded-bl-2xl h-[48px]'}` : ''
+            location === 'top' ? `top-0 right-0 border-b ${controlBarFocused ? 'rounded-bl-none h-[52px]' : 'rounded-bl-2xl h-[48px]'}` : ''
           }${
-            location === 'bottom' ? `rounded-tl-lg border-t bottom-0 right-0 ${controlBarFocused ? 'rounded-tl-none h-[52px]' : 'rounded-tl-2xl w-[48px]'}` : ''
+            location === 'bottom' ? `rounded-tl-lg border-t bottom-0 right-0 ${controlBarFocused ? 'rounded-tl-none h-[52px]' : 'rounded-tl-2xl h-[48px]'}` : ''
           }${
             location === 'left' ? `rounded-tr-lg border-r left-0 bottom-0 ${controlBarFocused ? 'rounded-tr-none w-[52px]' : 'rounded-tr-2xl w-[48px]'}` : ''
           }${
@@ -138,31 +149,45 @@ export const ControlBar = () => {
             />
         }
       </div>
-      <div className="flex flex-col w-full h-full justify-between items-center">
-        <div>
+      <div 
+        className={`flex w-full h-full justify-between items-center ${
+          location === 'top' || location === 'bottom' ? 'flex-row' : 'flex-col'
+        }`}
+      >
+        <div className={`${
+          location === 'top' || location === 'bottom' ? 'flex' : 'flex-col'
+        }`}>
           <div className="flex justify-center items-center transition duration-200 h-[52px] w-[52px] cursor-pointer hover:bg-slate-500/60">
             <RiSettings3Line 
-              className={`${iconColor}`} size={iconSize()}
+              className={`${iconColor()}`} size={iconSize()}
+              onClick={() => {
+                setTemp((prev) => {
+                  return prev === 3 ? 0 : (prev + 1)
+                })
+                setLocation(locationsArray[temp])
+              }}
             />
           </div>
           <div className="flex justify-center items-center transition duration-200 h-[52px] w-[52px] cursor-pointer hover:bg-slate-500/60">
             <RiAccountBoxLine 
-              className={`${iconColor}`} size={iconSize()}
+              className={`${iconColor()}`} size={iconSize()}
             />
           </div>
         </div>
-        <div>
+        <div className={`${
+          location === 'top' || location === 'bottom' ? 'flex flex-row' : 'flex flex-col'
+        }`}>
           <div className="flex justify-center items-center transition duration-200 h-[52px] w-[52px] cursor-pointer hover:bg-slate-500/60">
             <PiFilesDuotone 
-              className={`${iconColor}`} size={iconSize()}
+              className={`${iconColor()}`} size={iconSize()}
             />
           </div>
           <div className="flex justify-center items-center transition duration-200 h-[52px] w-[52px] cursor-pointer hover:bg-slate-500/60">
             <IoIosApps 
-              className={`${iconColor}`} size={iconSize()}
+              className={`${iconColor()}`} size={iconSize()}
             />
           </div>
-          <div className="h-[52px] w-full" />
+          <div className="h-[52px] w-[52px]" />
         </div>
       </div>
     </div>
