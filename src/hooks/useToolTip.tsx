@@ -1,7 +1,7 @@
 "use client"
 
-import { ToolTip } from "@/app/components/ToolTip"
 import { createContext, useContext, useState } from "react"
+import { ToolTip } from "@/app/components/ToolTip"
 
 const ToolTipContext = createContext({
   openToolTip: (text: string) => {},

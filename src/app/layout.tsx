@@ -3,8 +3,8 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 
 import { MetaTags } from "./components/MetaTags"
-import { ControlBar } from "@/app/components/ControlBar"
 import { ToolTipProvider } from "@/hooks/useToolTip"
+import { ControlBarProvider } from "@/hooks/useControlBar"
 
 const inter = Inter({ subsets: ["latin"]})
 
@@ -25,8 +25,9 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <ToolTipProvider>
-          <ControlBar />
-          {children}
+          <ControlBarProvider>
+            {children}
+          </ControlBarProvider>
         </ToolTipProvider>
       </body>
     </html>

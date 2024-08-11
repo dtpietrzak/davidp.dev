@@ -15,19 +15,20 @@ export const ToolTip: FC<ToolTipProps> = ({
   text = "",
 }) => {
   const { x, y } = useMousePosition()
-  const { width: windowWidth } = useWindowSize()
-  const { ref, width: elementWidth } = useElementSize()
+  const { width: windowWidth, height: windowHeight } = useWindowSize()
+  const { ref, width: elementWidth, height: elementHeight } = useElementSize()
 
-  if (show === false) return null
+  if (!show) return null
 
   return (
     <div
       ref={ref}
       className={`fixed z-50 py-1 px-2 bg-slate-800/30 border border-slate-400/50 text-white/80 rounded-lg max-w-32 backdrop-blur-xl`}
       style={{
-        top: y + 10,
+        top: y > (windowHeight - (elementHeight + 30)) ? 
+          (y - elementHeight - 10) : y + 10,
         left: x > (windowWidth - (elementWidth + 30)) ? 
-          (x - elementWidth - 16) : x + 10,
+          (x - elementWidth - 20) : x + 20,
       }}
     >
       <p className="text-sm">{text}</p>
