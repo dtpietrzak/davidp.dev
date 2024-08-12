@@ -26,8 +26,10 @@ export default function RootLayout({
       <body className={inter.className}>
         <ToolTipProvider>
           <ControlBarProvider>
-            <div className="flex safe-h-full flex-col items-center justify-between p-24 bg-repeat bg-pattern-light dark:bg-pattern-dark opacity-50">
-              {children}
+            <div className="h-full w-full bg-repeat bg-pattern-light dark:bg-pattern-dark opacity-50">
+              <div className="flex safe-h-full flex-col items-center justify-between p-24">
+                {children}
+              </div>
             </div>
           </ControlBarProvider>
         </ToolTipProvider>

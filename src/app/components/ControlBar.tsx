@@ -322,7 +322,7 @@ const Menu: FC<MenuProps> = ({
 
   return (
     <div 
-      className={`flex flex-col text-sm dark:text-white text-black py-2 px-2 fixed z-20 h-fit max-h-full min-w-[240px] max-w-[480px] bg-gray-400/30 dark:bg-gray-600/30 backdrop-blur-xl ${
+      className={`flex flex-col text-sm dark:text-white text-black py-2 px-2 fixed z-20 h-fit max-h-full min-w-[240px] max-w-[480px] bg-gray-400/30 dark:bg-gray-600/30 backdrop-blur-xl shadow-md ${
         controlBarLocation === 'top' ? 'top-[52px] rounded-b-xl' : ''
       } ${
         controlBarLocation === 'bottom' ? 'safe-bottom-minus-bar rounded-t-xl' : ''

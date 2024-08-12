@@ -16,7 +16,7 @@ export const MetaTags = () => {
       <meta name="apple-mobile-web-app-title" content="davidp.dev" />
       <meta name="format-detection" content="telephone=no" />
       <meta name="mobile-web-app-capable" content="yes" />
-      <meta name="theme-color" media="(prefers-color-scheme: light)" content="#e6e9d6" />
+      <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fbfbe7" />
       <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#202021" />
       <link rel="manifest" href="/manifest.json" />
       <link rel="shortcut icon" href="/favicon.ico" />
