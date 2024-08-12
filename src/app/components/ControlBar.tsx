@@ -4,18 +4,25 @@ import { useMousePosition } from "@/hooks/useMouseLocation"
 import { useToolTip } from "@/hooks/useToolTip"
 import { useWindowSize } from "@/hooks/useWindowSize"
 import { useClickAway } from "@/hooks/useClickAway"
-import { Component, FC, useCallback, useEffect, useState } from "react"
+import { FC, useCallback, useEffect, useState } from "react"
 
 import { BiWindows, BiDotsVertical } from "react-icons/bi"
 import { IoIosApps } from "react-icons/io"
 import { PiFilesDuotone } from "react-icons/pi"
-import { RiSettings3Line, RiAccountBoxLine, RiMenuFill } from "react-icons/ri"
-import { IconBase, IconType } from "react-icons"
+import { RiSettings3Line, RiAccountBoxLine } from "react-icons/ri"
+import { IconType } from "react-icons"
 
 let timeInControlBarHitbox = 0
 
+type VerticalLocation = 'top' | 'bottom'
+type HorizontalLocation = 'left' | 'right'
+
+type BiLocation = 'top-left' | 'bottom-right'
+
+type Location = VerticalLocation | HorizontalLocation
+
 type ControlBarOptions = {
-  location: 'top' | 'bottom' | 'left' | 'right'
+  location: Location
 }
 
 const locationsArray: ControlBarOptions['location'][] = ['right', 'left', 'top', 'bottom']
@@ -26,10 +33,28 @@ export const ControlBar = () => {
   const { width, height } = useWindowSize()
   
   const [mouseInControlHandle, setMouseInControlHandle] = useState(false)
+  const [mouseInControlBar, setMouseInControlBar] = useState(false)
+  const [mouseInMenu, setMouseInMenu] = useState(false)
+
   const [controlBarFocused, setControlBarFocused] = useState(false)
   const [temp, setTemp] = useState(0)
   const [location, setLocation] = 
   useState<ControlBarOptions['location']>(locationsArray[temp])
+  const [menuDirection, setMenuDirection] = useState<BiLocation | null>(null)
+
+  const closeControlBar = useCallback(() => {
+    timeInControlBarHitbox = 0
+    setControlBarFocused(false)
+    setMouseInControlHandle(false)
+    setMouseInControlBar(false)
+    setMouseInMenu(false)
+    setMenuDirection(null)
+  }, [])
+
+  const controlButtonClicked = () => {
+    setMouseInControlBar(true)
+    setControlBarFocused(true)
+  }
   
   const clickAwayRef = useClickAway(() => {
     if (controlBarFocused && (
@@ -38,64 +63,58 @@ export const ControlBar = () => {
       location === 'left' && x > 52 ||
       location === 'right' && x < width - 52
     )) {
-      timeInControlBarHitbox = 0
-      setControlBarFocused(false)
-      setMouseInControlHandle(false)
+      closeControlBar()
     }
   })
 
   const handleControlBarFocused = useCallback((
     relativeMousePosition: number,
-    _mouseInControlHandle: boolean,
+    _mouseInside: boolean,
   ) => {
     if (!controlBarFocused) {
-      if (_mouseInControlHandle) {
+      if (_mouseInside) {
         timeInControlBarHitbox = 5
         setControlBarFocused(true)
       } else if ((relativeMousePosition >= 0 && relativeMousePosition < 10)) {
         if (timeInControlBarHitbox > 5) setControlBarFocused(true)
         else timeInControlBarHitbox++
       } else {
-        timeInControlBarHitbox = 0
-        setControlBarFocused(false)
+        closeControlBar()
       }
     } else {
-      if ((relativeMousePosition >= 0 && relativeMousePosition < 52) || _mouseInControlHandle) {
+      if ((relativeMousePosition >= 0 && relativeMousePosition < 52) || _mouseInside) {
         if (timeInControlBarHitbox > 5) setControlBarFocused(true)
         else timeInControlBarHitbox++
       } else {
-        timeInControlBarHitbox = 0
-        setControlBarFocused(false)
+        closeControlBar()
       }
     }
-  }, [controlBarFocused])
+  }, [closeControlBar, controlBarFocused])
 
   const logicClockCallback = useCallback(() => {
+    const mouseInside = mouseInControlHandle || mouseInControlBar || mouseInMenu
 
     switch (location) {
       case 'top':
-        handleControlBarFocused(y, mouseInControlHandle)
+        handleControlBarFocused(y, mouseInside)
         break
       case 'bottom':
-        handleControlBarFocused(height - y, mouseInControlHandle)
+        handleControlBarFocused(height - y, mouseInside)
         break
       case 'left':
-        handleControlBarFocused(x, mouseInControlHandle)
+        handleControlBarFocused(x, mouseInside)
         break
       case 'right':
-        handleControlBarFocused(width - x, mouseInControlHandle)
+        handleControlBarFocused(width - x, mouseInside)
         break
     }
     
-  }, [handleControlBarFocused, mouseInControlHandle, height, location, width, x, y])
+  }, [handleControlBarFocused, mouseInControlHandle, mouseInControlBar, mouseInMenu, height, location, width, x, y])
 
   useEffect(() => {
     const intervalId = setInterval(logicClockCallback, 33)
     return () => clearInterval(intervalId)
   }, [logicClockCallback])
-
-  const iconSize = () => (controlBarFocused ? 24 : 12)
-  const iconColor = () => `dark:text-white text-black`
 
   return (
     <>
@@ -120,6 +139,15 @@ export const ControlBar = () => {
             location === 'right' ? 'border-l right-0' : ''
           }`
         }
+        onMouseEnter={() => {
+          setMouseInControlBar(true)
+        }}
+        onMouseLeave={() => {
+          setMouseInControlBar(false)
+        }}
+        onClick={() => {
+          setMouseInControlBar(true)
+        }}
       >
         <div 
           className={`flex w-full h-full justify-between items-center ${
@@ -132,6 +160,8 @@ export const ControlBar = () => {
             <IconButton 
               Icon={RiSettings3Line} controlBarFocused={controlBarFocused}
               onClick={() => {
+                controlButtonClicked()
+                setMenuDirection('top-left')
                 setTemp((prev) => {
                   return prev === 3 ? 0 : (prev + 1)
                 })
@@ -140,7 +170,10 @@ export const ControlBar = () => {
             />
             <IconButton 
               Icon={RiAccountBoxLine} controlBarFocused={controlBarFocused}
-              onClick={() => {}}
+              onClick={() => {
+                controlButtonClicked()
+                setMenuDirection('top-left')
+              }}
             />
           </div>
           <div className={`${
@@ -148,11 +181,17 @@ export const ControlBar = () => {
           }`}>
             <IconButton 
               Icon={PiFilesDuotone} controlBarFocused={controlBarFocused}
-              onClick={() => {}}
+              onClick={() => {
+                controlButtonClicked()
+                setMenuDirection('bottom-right')
+              }}
             />
             <IconButton 
               Icon={IoIosApps} controlBarFocused={controlBarFocused}
-              onClick={() => {}}
+              onClick={() => {
+                controlButtonClicked()
+                setMenuDirection('bottom-right')
+              }}
             />
             <div className="h-[52px] w-[52px]" />
           </div>
@@ -161,7 +200,7 @@ export const ControlBar = () => {
 
       <div
         className={
-          `z-40 transition-all duration-300 fixed border hover:bg-gray-100/60 dark:hover:bg-gray-700/60 backdrop-blur-xl flex justify-center items-center cursor-pointer ${controlBarFocused ? 'border-transparent bg-transparent m-0' : 'border-gray-500/50 bg-gray-200/30 dark:bg-gray-600/40 shadow-md m-[2px]'} ${
+          `z-40 transition-all duration-300 fixed border hover:bg-gray-100/60 dark:hover:bg-gray-500/60 backdrop-blur-xl flex justify-center items-center cursor-pointer ${controlBarFocused ? 'border-transparent bg-transparent m-0' : 'border-gray-500/50 bg-gray-200/30 dark:bg-gray-600/40 shadow-md m-[2px]'} ${
             location === 'top' || location === 'bottom' ?
             // top or bottom
               `${controlBarFocused ? 'w-[52px]' : 'w-[44px]'}` : 
@@ -184,21 +223,52 @@ export const ControlBar = () => {
           setMouseInControlHandle(false)
         }}
         onClick={() => {
+          if (controlBarFocused) {
+            controlButtonClicked()
+            setMenuDirection('bottom-right')
+          }
+
           setControlBarFocused(true)
         }}
       >
         {
           controlBarFocused ? 
             <BiWindows 
-              className={`${iconColor()} drop-shadow-[0px_0px_5px_rgba(255,255,255,0.25)]`} size={24}
+              className={`dark:text-white text-black drop-shadow-[0px_0px_5px_rgba(255,255,255,0.25)]`} size={24}
             /> : 
             <BiDotsVertical 
-              className={`${iconColor()} drop-shadow-[0px_0px_5px_rgba(255,255,255,0.25)]`} size={24}
+              className={`dark:text-white text-black drop-shadow-[0px_0px_5px_rgba(255,255,255,0.25)]`} size={24}
             />
         }
       </div>
+      <Menu 
+        direction={menuDirection}
+        controlBarLocation={location}
+        items={[{
+          graphicIcon: '',
+          label: 'node-ish',
+          onClick: () => {},
+        },{
+          graphicIcon: '',
+          label: 'app builder',
+          onClick: () => {},
+        },{
+          graphicIcon: '',
+          label: 'text editor',
+          onClick: () => {},
+        },{
+          graphicIcon: '',
+          label: 'web browser',
+          onClick: () => {},
+        }]}
+        onMouseEnter={() => {
+          setMouseInMenu(true)
+        }}
+        onMouseLeave={() => {
+          setMouseInMenu(false)
+        }}
+      />
     </>
-    
   )
 }
 
@@ -219,10 +289,93 @@ const IconButton: FC<IconButtonProps> = ({
   const iconColor = () => `dark:text-white text-black`
 
   return (
-    <button className="flex justify-center items-center transition duration-200 h-[52px] w-[52px] cursor-pointer hover:bg-gray-100/60 dark:hover:bg-gray-700/60" onClick={onClick}>
+    <button className="flex justify-center items-center transition duration-200 h-[52px] w-[52px] cursor-pointer hover:bg-gray-100/60 dark:hover:bg-gray-500/60" onClick={onClick}>
       <Icon
         className={`${iconColor()} drop-shadow-[0px_0px_5px_rgba(255,255,255,0.25)]`} size={size ?? iconSize()}
       />
     </button>
+  )
+}
+
+type MenuItem = {
+  graphicIcon: string
+  label: string
+  onClick: () => void
+}
+
+type MenuProps = {
+  direction: BiLocation | null
+  controlBarLocation: ControlBarOptions['location']
+  items: MenuItem[]
+  onMouseEnter?: () => void
+  onMouseLeave?: () => void
+}
+
+const Menu: FC<MenuProps> = ({
+  direction,
+  controlBarLocation,
+  items,
+  onMouseEnter,
+  onMouseLeave,
+}) => {
+  if (!direction) return null
+
+  return (
+    <div 
+      className={`flex flex-col text-sm dark:text-white text-black py-2 px-2 fixed z-20 h-fit max-h-full min-w-[240px] max-w-[480px] bg-gray-400/30 dark:bg-gray-600/30 backdrop-blur-xl ${
+        controlBarLocation === 'top' ? 'top-[52px] rounded-b-xl' : ''
+      } ${
+        controlBarLocation === 'bottom' ? 'bottom-[52px] rounded-t-xl' : ''
+      } ${
+        controlBarLocation === 'left' ? 'left-[52px] rounded-r-xl' : ''
+      } ${
+        controlBarLocation === 'right' ? 'right-[52px] rounded-l-xl' : ''
+      } ${
+        (
+          (controlBarLocation === 'top' || controlBarLocation === 'bottom') &&
+          direction === 'top-left'
+        ) ? 'left-0' : ''
+      } ${
+        (
+          (controlBarLocation === 'top' || controlBarLocation === 'bottom') &&
+          direction === 'bottom-right'
+        ) ? 'right-0' : ''
+      } ${
+        (
+          (controlBarLocation === 'left' || controlBarLocation === 'right') &&
+          direction === 'top-left'
+        ) ? 'top-0' : ''
+      } ${
+        (
+          (controlBarLocation === 'left' || controlBarLocation === 'right') &&
+          direction === 'bottom-right'
+        ) ? 'bottom-0' : ''
+      }`}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
+      {
+        items.map((item, index) => {
+          return (
+            <div
+              key={item.label}
+            >
+              {
+                index !== 0 ?
+                  <div className="w-full flex justify-center items-center">
+                    <div className="bg-gray-500/50 dark:bg-gray-500/50 w-[calc(100%-20px)] h-[1px]" />
+                  </div> :
+                  <></>
+              }
+              <button
+                className={`flex items-center justify-start w-full py-2 px-4 hover:bg-gray-100/60 dark:hover:bg-gray-500/60 cursor-pointer rounded-lg my-[2px]`}
+              >
+                {item.label}
+              </button>
+            </div>
+          )
+        })
+      }
+    </div>
   )
 }
