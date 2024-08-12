@@ -128,11 +128,11 @@ export const ControlBar = () => {
             // top or bottom
               `w-full ${ controlBarFocused ? 'h-[52px]' : 'h-[11px]' }` : 
             // left or right
-              `h-[calc(100dvh)] ${ controlBarFocused ? 'w-[52px]' : 'w-[11px]' }` 
+              `safe-h-full ${ controlBarFocused ? 'w-[52px]' : 'w-[11px]' }` 
           } ${
             location === 'top' ? 'border-b top-0' : ''
           }${
-            location === 'bottom' ? 'border-t bottom-0' : ''
+            location === 'bottom' ? 'border-t safe-bottom' : ''
           }${
             location === 'left' ? 'border-r left-0' : ''
           }${
@@ -209,11 +209,11 @@ export const ControlBar = () => {
           } ${
             location === 'top' ? `top-0 right-0 ${controlBarFocused ? 'rounded-none h-[51px]' : 'rounded-[22px] h-[44px]'}` : ''
           }${
-            location === 'bottom' ? `bottom-0 right-0 ${controlBarFocused ? 'rounded-none h-[51px]' : 'rounded-[22px] h-[44px]'}` : ''
+            location === 'bottom' ? `safe-bottom right-0 ${controlBarFocused ? 'rounded-none h-[51px]' : 'rounded-[22px] h-[44px]'}` : ''
           }${
-            location === 'left' ? `left-0 bottom-0 ${controlBarFocused ? 'rounded-none w-[51px]' : 'rounded-[22px] w-[44px]'}` : ''
+            location === 'left' ? `left-0 safe-bottom ${controlBarFocused ? 'rounded-none w-[51px]' : 'rounded-[22px] w-[44px]'}` : ''
           }${
-            location === 'right' ? `right-0 bottom-0 ${controlBarFocused ? 'rounded-none w-[51px]' : 'rounded-[22px] w-[44px]'}` : ''
+            location === 'right' ? `right-0 safe-bottom ${controlBarFocused ? 'rounded-none w-[51px]' : 'rounded-[22px] w-[44px]'}` : ''
           }`
         }
         onMouseEnter={() => {
@@ -325,7 +325,7 @@ const Menu: FC<MenuProps> = ({
       className={`flex flex-col text-sm dark:text-white text-black py-2 px-2 fixed z-20 h-fit max-h-full min-w-[240px] max-w-[480px] bg-gray-400/30 dark:bg-gray-600/30 backdrop-blur-xl ${
         controlBarLocation === 'top' ? 'top-[52px] rounded-b-xl' : ''
       } ${
-        controlBarLocation === 'bottom' ? 'bottom-[52px] rounded-t-xl' : ''
+        controlBarLocation === 'bottom' ? 'safe-bottom-minus-bar rounded-t-xl' : ''
       } ${
         controlBarLocation === 'left' ? 'left-[52px] rounded-r-xl' : ''
       } ${
@@ -349,7 +349,7 @@ const Menu: FC<MenuProps> = ({
         (
           (controlBarLocation === 'left' || controlBarLocation === 'right') &&
           direction === 'bottom-right'
-        ) ? 'bottom-0' : ''
+        ) ? 'safe-bottom' : ''
       }`}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
