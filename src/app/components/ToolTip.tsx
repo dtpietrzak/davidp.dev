@@ -23,7 +23,7 @@ export const ToolTip: FC<ToolTipProps> = ({
   return (
     <div
       ref={ref}
-      className={`fixed z-50 py-1 px-2 bg-slate-800/30 border border-slate-400/50 text-white/80 rounded-lg max-w-32 backdrop-blur-xl`}
+      className={`fixed z-50 py-1 px-2 bg-gray-800/30 border border-gray-400/50 text-white/80 rounded-lg max-w-32 backdrop-blur-xl`}
       style={{
         top: y > (windowHeight - (elementHeight + 30)) ? 
           (y - elementHeight - 10) : y + 10,
