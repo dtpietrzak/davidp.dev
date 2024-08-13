@@ -5,12 +5,15 @@ import { useToolTip } from "@/hooks/useToolTip"
 import { useWindowSize } from "@/hooks/useWindowSize"
 import { useClickAway } from "@/hooks/useClickAway"
 import { FC, useCallback, useEffect, useState } from "react"
+import { createRoot } from "react-dom/client"
 
 import { BiWindows, BiDotsVertical } from "react-icons/bi"
 import { IoIosApps } from "react-icons/io"
 import { PiFilesDuotone } from "react-icons/pi"
 import { RiSettings3Line, RiAccountBoxLine } from "react-icons/ri"
 import { IconType } from "react-icons"
+import { flushSync } from "react-dom"
+import { FileExplorer } from "@/app/apps/FileExplorer"
 
 let timeInControlBarHitbox = 0
 
@@ -37,10 +40,114 @@ export const ControlBar = () => {
   const [mouseInMenu, setMouseInMenu] = useState(false)
 
   const [controlBarFocused, setControlBarFocused] = useState(false)
+  const [shouldTransition, setShouldTransition] = useState(false)
   const [temp, setTemp] = useState(0)
   const [location, setLocation] = 
-  useState<ControlBarOptions['location']>(locationsArray[temp])
+    useState<ControlBarOptions['location']>(locationsArray[temp])
+
   const [menuDirection, setMenuDirection] = useState<BiLocation | null>(null)
+  const [menuSelected, setMenuSelected] = 
+    useState<keyof typeof menuItems>('none')
+
+  const clickAwayRef = useClickAway(() => {
+    if (controlBarFocused && (
+      location === 'top' && y > 52 ||
+        location === 'bottom' && y < height - 52 ||
+        location === 'left' && x > 52 ||
+        location === 'right' && x < width - 52
+    )) {
+      setTimeout(() => { closeControlBar() }, 200)
+    }
+  })
+
+  const menuItems: Record<string, MenuItem[]> = {
+    none: [],
+    settings: [{
+      graphicIcon: '',
+      label: 'Light / Dark Theme',
+      onClick: () => {
+        const theme = localStorage.getItem('theme')
+        if (theme) {
+          if (theme === 'dark') {
+            localStorage.setItem('theme', 'light')
+            document.documentElement.classList.remove('dark')
+            document.body.style.setProperty('background', '#FFF')
+          } else {
+            localStorage.setItem('theme', 'dark')
+            document.documentElement.classList.add('dark')
+            document.body.style.setProperty('background', '#000')
+          }
+        } else {
+          document.documentElement.classList.remove('dark')
+          document.body.style.setProperty('background', '#FFF')
+        }
+      },
+    },{
+      graphicIcon: '',
+      label: 'Control Bar Location',
+      onClick: () => {
+        flushSync(() => {
+          closeControlBar()
+          setShouldTransition(false)
+        })
+        setTemp((prev) => {
+          return prev === 3 ? 0 : (prev + 1)
+        })
+        setLocation(locationsArray[temp])
+      },
+    }],
+    account: [{
+      graphicIcon: '',
+      label: 'Log Out',
+      onClick: () => {},
+    },{
+      graphicIcon: '',
+      label: 'Profile',
+      onClick: () => {},
+    }],
+    apps: [{
+      graphicIcon: '',
+      label: 'Node-ish',
+      onClick: () => {},
+    },{
+      graphicIcon: '',
+      label: 'App Builder',
+      onClick: () => {},
+    },{
+      graphicIcon: '',
+      label: 'Web Browser',
+      onClick: () => {},
+    },{
+      graphicIcon: '',
+      label: 'Text Editor',
+      onClick: () => {},
+    },{
+      graphicIcon: '',
+      label: 'Weather',
+      onClick: () => {},
+    },{
+      graphicIcon: '',
+      label: 'System Information',
+      onClick: () => {},
+    }],
+    windows: [{
+      graphicIcon: '',
+      label: 'Node-ish',
+      onClick: () => {},
+    },{
+      graphicIcon: '',
+      label: 'Web Browser',
+      onClick: () => {},
+    },{
+      graphicIcon: '',
+      label: 'Text Editor',
+      onClick: () => {},
+    }],
+  }
+
+  useEffect(() => {
+    setShouldTransition(true)
+  }, [location])
 
   const closeControlBar = useCallback(() => {
     timeInControlBarHitbox = 0
@@ -55,17 +162,6 @@ export const ControlBar = () => {
     setMouseInControlBar(true)
     setControlBarFocused(true)
   }
-  
-  const clickAwayRef = useClickAway(() => {
-    if (controlBarFocused && (
-      location === 'top' && y > 52 ||
-      location === 'bottom' && y < height - 52 ||
-      location === 'left' && x > 52 ||
-      location === 'right' && x < width - 52
-    )) {
-      closeControlBar()
-    }
-  })
 
   const handleControlBarFocused = useCallback((
     relativeMousePosition: number,
@@ -116,12 +212,24 @@ export const ControlBar = () => {
     return () => clearInterval(intervalId)
   }, [logicClockCallback])
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (shouldTransition) setShouldTransition(false)
+      if (controlBarFocused) closeControlBar()
+      setTimeout(() => {
+        setShouldTransition(true)
+      }, 500)
+    }
+    addEventListener('resize', handleResize)
+    return () => removeEventListener('resize', handleResize)
+  }, [closeControlBar, controlBarFocused, shouldTransition])
+
   return (
     <>
       <div 
         ref={clickAwayRef}
         className={
-          `z-30 overflow-hidden fixed transition-all ease-out backdrop-blur-xl border-gray-500/50 ${ 
+          `z-30 overflow-hidden fixed ease-out select-none backdrop-blur-md border-gray-500/50 ${shouldTransition ? 'transition-all' : ''} ${ 
             controlBarFocused ? 'shadow-[0px_0px_12px_4px_rgb(0,0,0,0.1)] bg-gray-400/30 dark:bg-gray-600/30' : 'shadow-[inset_2px_-1px_4px_rgb(0,0,0,0.05)] bg-gray-300/10 dark:bg-gray-700/10'
           } ${
             location === 'top' || location === 'bottom' ?
@@ -158,21 +266,19 @@ export const ControlBar = () => {
             location === 'top' || location === 'bottom' ? 'flex' : 'flex-col'
           }`}>
             <IconButton 
-              Icon={RiSettings3Line} controlBarFocused={controlBarFocused}
-              onClick={() => {
-                controlButtonClicked()
-                setMenuDirection('top-left')
-                setTemp((prev) => {
-                  return prev === 3 ? 0 : (prev + 1)
-                })
-                setLocation(locationsArray[temp])
-              }}
-            />
-            <IconButton 
               Icon={RiAccountBoxLine} controlBarFocused={controlBarFocused}
               onClick={() => {
                 controlButtonClicked()
                 setMenuDirection('top-left')
+                setMenuSelected('account')
+              }}
+            />
+            <IconButton 
+              Icon={RiSettings3Line} controlBarFocused={controlBarFocused}
+              onClick={() => {
+                controlButtonClicked()
+                setMenuDirection('top-left')
+                setMenuSelected('settings')
               }}
             />
           </div>
@@ -183,7 +289,18 @@ export const ControlBar = () => {
               Icon={PiFilesDuotone} controlBarFocused={controlBarFocused}
               onClick={() => {
                 controlButtonClicked()
-                setMenuDirection('bottom-right')
+                setMenuDirection(null)
+                setMenuSelected('none')
+
+
+                const fileExplorerElement = document.getElementById('file-explorer') ?? document.createElement('div')
+                fileExplorerElement.id = 'file-explorer'
+
+                const main = document.getElementById('main')
+                main?.appendChild(fileExplorerElement)
+
+                const fileExplorerComponent = createRoot(fileExplorerElement)
+                fileExplorerComponent.render(<FileExplorer />)
               }}
             />
             <IconButton 
@@ -191,6 +308,7 @@ export const ControlBar = () => {
               onClick={() => {
                 controlButtonClicked()
                 setMenuDirection('bottom-right')
+                setMenuSelected('apps')
               }}
             />
             <div className="h-[52px] w-[52px]" />
@@ -200,7 +318,7 @@ export const ControlBar = () => {
 
       <div
         className={
-          `z-40 transition-all duration-300 fixed border hover:bg-gray-100/60 dark:hover:bg-gray-500/60 backdrop-blur-xl flex justify-center items-center cursor-pointer ${controlBarFocused ? 'border-transparent bg-transparent m-0' : 'border-gray-500/50 bg-gray-200/30 dark:bg-gray-600/40 shadow-md m-[2px]'} ${
+          `z-40 transition-all duration-300 fixed border hover:bg-gray-100/60 dark:hover:bg-gray-500/60 backdrop-blur-md flex justify-center items-center cursor-pointer ${controlBarFocused ? 'border-transparent bg-transparent m-0' : 'border-gray-500/50 bg-gray-200/30 dark:bg-gray-600/40 shadow-md m-[2px]'} ${
             location === 'top' || location === 'bottom' ?
             // top or bottom
               `${controlBarFocused ? 'w-[52px]' : 'w-[44px]'}` : 
@@ -226,6 +344,7 @@ export const ControlBar = () => {
           if (controlBarFocused) {
             controlButtonClicked()
             setMenuDirection('bottom-right')
+            setMenuSelected('windows')
           }
 
           setControlBarFocused(true)
@@ -244,23 +363,7 @@ export const ControlBar = () => {
       <Menu 
         direction={menuDirection}
         controlBarLocation={location}
-        items={[{
-          graphicIcon: '',
-          label: 'node-ish',
-          onClick: () => {},
-        },{
-          graphicIcon: '',
-          label: 'app builder',
-          onClick: () => {},
-        },{
-          graphicIcon: '',
-          label: 'text editor',
-          onClick: () => {},
-        },{
-          graphicIcon: '',
-          label: 'web browser',
-          onClick: () => {},
-        }]}
+        items={menuItems[menuSelected]}
         onMouseEnter={() => {
           setMouseInMenu(true)
         }}
@@ -322,14 +425,14 @@ const Menu: FC<MenuProps> = ({
 
   return (
     <div 
-      className={`flex flex-col text-sm dark:text-white text-black py-2 px-2 fixed z-20 h-fit max-h-full min-w-[240px] max-w-[480px] bg-gray-400/30 dark:bg-gray-600/30 backdrop-blur-xl shadow-md ${
-        controlBarLocation === 'top' ? 'top-[52px] rounded-b-xl' : ''
+      className={`flex flex-col text-sm dark:text-white text-black py-1.5 pl-1.5 pr-1 fixed z-20 h-fit max-h-full min-w-[240px] max-w-[480px] bg-gray-400/30 dark:bg-gray-600/30 backdrop-blur-md shadow-md overflow-scroll scrollbar-hide ${
+        controlBarLocation === 'top' ? 'top-[52px] rounded-b-2xl' : ''
       } ${
-        controlBarLocation === 'bottom' ? 'safe-bottom-minus-bar rounded-t-xl' : ''
+        controlBarLocation === 'bottom' ? 'safe-bottom-minus-bar rounded-t-2xl' : ''
       } ${
-        controlBarLocation === 'left' ? 'left-[52px] rounded-r-xl' : ''
+        controlBarLocation === 'left' ? 'left-[52px] rounded-r-2xl' : ''
       } ${
-        controlBarLocation === 'right' ? 'right-[52px] rounded-l-xl' : ''
+        controlBarLocation === 'right' ? 'right-[52px] rounded-l-2xl' : ''
       } ${
         (
           (controlBarLocation === 'top' || controlBarLocation === 'bottom') &&
@@ -363,12 +466,15 @@ const Menu: FC<MenuProps> = ({
               {
                 index !== 0 ?
                   <div className="w-full flex justify-center items-center">
-                    <div className="bg-gray-500/50 dark:bg-gray-500/50 w-[calc(100%-20px)] h-[1px]" />
+                    <div className="bg-gray-500/20 dark:bg-gray-500/20 w-[calc(100%-24px)] h-[1px]" />
                   </div> :
                   <></>
               }
               <button
-                className={`flex items-center justify-start w-full py-2 px-4 hover:bg-gray-100/60 dark:hover:bg-gray-500/60 cursor-pointer rounded-lg my-[2px]`}
+                className={`flex items-center justify-start w-full py-2 px-4 hover:bg-gray-100/60 dark:hover:bg-gray-500/60 cursor-pointer rounded-xl my-[2px] shadow-none hover:shadow`}
+                onClick={() => {
+                  item.onClick()
+                }}
               >
                 {item.label}
               </button>

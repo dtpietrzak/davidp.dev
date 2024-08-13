@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <head>
         <MetaTags />
       </head>
@@ -28,7 +28,7 @@ export default function RootLayout({
         <InitialLoad />
         <ToolTipProvider>
           <ControlBarProvider>
-            <div id="screen" className="h-full w-full bg-repeat bg-pattern-light dark:bg-pattern-dark opacity-50">
+            <div id="screen" className="h-full w-full bg-repeat bg-pattern-light dark:bg-pattern-dark">
               <div className="flex safe-h-full flex-col items-center justify-between p-24">
                 {children}
               </div>
