@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { Martian_Mono as PrimaryFont } from "next/font/google"
 import "./globals.css"
 
 import { MetaTags } from "./components/MetaTags"
@@ -7,7 +7,12 @@ import { ToolTipProvider } from "@/hooks/useToolTip"
 import { ControlBarProvider } from "@/hooks/useControlBar"
 import { InitialLoad } from "@/app/utils/InitialLoad"
 
-const inter = Inter({ subsets: ["latin"]})
+const font = PrimaryFont({
+  subsets: ["latin"],
+  weight: "300",
+  style: "normal",
+  preload: true,
+})
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -24,7 +29,7 @@ export default function RootLayout({
       <head>
         <MetaTags />
       </head>
-      <body className={inter.className}>
+      <body className={`${font.className} `}>
         <InitialLoad />
         <ToolTipProvider>
           <ControlBarProvider>
