@@ -5,6 +5,7 @@ import "./globals.css"
 import { MetaTags } from "./components/MetaTags"
 import { ToolTipProvider } from "@/hooks/useToolTip"
 import { ControlBarProvider } from "@/hooks/useControlBar"
+import { InitialLoad } from "@/app/utils/InitialLoad"
 
 const inter = Inter({ subsets: ["latin"]})
 
@@ -24,9 +25,10 @@ export default function RootLayout({
         <MetaTags />
       </head>
       <body className={inter.className}>
+        <InitialLoad />
         <ToolTipProvider>
           <ControlBarProvider>
-            <div className="h-full w-full bg-repeat bg-pattern-light dark:bg-pattern-dark opacity-50">
+            <div id="screen" className="h-full w-full bg-repeat bg-pattern-light dark:bg-pattern-dark opacity-50">
               <div className="flex safe-h-full flex-col items-center justify-between p-24">
                 {children}
               </div>

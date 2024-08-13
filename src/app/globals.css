@@ -7,6 +7,8 @@
   --background-rgb: 255, 255, 255;
   --safe-area-inset-top: env(safe-area-inset-top, 0px);
   --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+
+  --home-indicator-height: 0px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -20,7 +22,14 @@ body {
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-rgb));
   height: 100%;
+  height: -webkit-fill-available;
   overflow: hidden;
+}
+
+@supports (viewport-fit: cover) {
+  html {
+    viewport-fit: cover;
+  }
 }
 
 @layer utilities {
@@ -28,18 +37,22 @@ body {
     text-wrap: balance;
   }
   .safe-h-full {
-    height: calc(100dvh - (var(--safe-area-inset-top) + var(--safe-area-inset-bottom)));
+    height: calc(100dvh - (var(--safe-area-inset-top) + var(--safe-area-inset-bottom) + var(--home-indicator-height)));
   }
   .safe-pb {
-    padding-bottom: calc(var(--safe-area-inset-bottom));
+    padding-bottom: calc(var(--safe-area-inset-bottom) + var(--home-indicator-height));
   }
   .safe-mb {
-    margin-bottom: calc(var(--safe-area-inset-bottom));
+    margin-bottom: calc(var(--safe-area-inset-bottom) + var(--home-indicator-height));
   }
   .safe-bottom {
-    bottom: calc(var(--safe-area-inset-bottom));
+    bottom: calc(var(--safe-area-inset-bottom) + var(--home-indicator-height));
   }
   .safe-bottom-minus-bar {
-    bottom: calc(var(--safe-area-inset-bottom) + 52px);
+    bottom: calc(var(--safe-area-inset-bottom) + 52px + var(--home-indicator-height));
   }
+}
+
+.safe-area-bottom-bar {
+  margin-bottom: 52px;
 }
