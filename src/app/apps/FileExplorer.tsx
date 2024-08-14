@@ -97,7 +97,7 @@ type OpenWindow = (
 
 export type App = FC<OpenWindowOsDataForApp>
 
-export const openFileExplorer = ({ forApp, forRender }) => {
+export const openWindow_FileExplorer = ({ forApp, forRender }) => {
   return renderWindow({
     title: 'File Explorer',
     windowId: 'file-explorer',
