@@ -39,14 +39,26 @@ export const FileExplorer = () => {
   )
 }
 
-export const renderFileExplorer = () => {
-  const fileExplorerElement = document.getElementById('file-explorer') ?? document.createElement('div')
-  fileExplorerElement.id = 'file-explorer'
+export const initializeComponent = (
+  windowId: string,
+) => {
+  const element = document.getElementById(windowId) ?? document.createElement('div')
+  element.id = windowId
 
   const main = document.getElementById('main')
-  main?.appendChild(fileExplorerElement)
+  if (!main) return null
+  main.appendChild(element)
 
-  const fileExplorerComponent = createRoot(fileExplorerElement)
+  const componentRoot = createRoot(element)
+  return componentRoot
+}
+
+export const openWindow() => {
+  
+}
+
+export const renderFileExplorer = () => {
+  const fileExplorerComponent = initializeComponent('file-explorer')
   fileExplorerComponent.render(
     <Window
       title="File Explorer"
