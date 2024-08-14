@@ -1,17 +1,62 @@
 import type { Metadata } from "next"
-import { Martian_Mono as PrimaryFont } from "next/font/google"
+import { 
+  Karla as WindowGrabFont,
+  Urbanist as HeroFont,
+  Outfit as HeaderFont,
+  Comfortaa as BodyFont,
+  M_PLUS_1p as TinyFont,
+} from "next/font/google"
 import "./globals.css"
+
+// Karla for Window Grab Bar
+// Outfit for larger body text
+// Comfortaa for body text
+
+// Text Editor Fonts
+// Karla
+// Comfortaa
+// Outfit
+// Mate_SC
+
 
 import { MetaTags } from "./components/MetaTags"
 import { ToolTipProvider } from "@/hooks/useToolTip"
 import { ControlBarProvider } from "@/hooks/useControlBar"
 import { InitialLoad } from "@/app/utils/InitialLoad"
 
-const font = PrimaryFont({
+const windowGrabFont = WindowGrabFont({
   subsets: ["latin"],
   weight: "300",
   style: "normal",
-  preload: true,
+  variable: "--font-window-grab",
+})
+
+const heroFont = HeroFont({
+  subsets: ["latin"],
+  weight: "900",
+  style: "normal",
+  variable: "--font-hero",
+})
+
+const headerFont = HeaderFont({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  style: "normal",
+  variable: "--font-header",
+})
+
+const bodyFont = BodyFont({
+  subsets: ["latin"],
+  weight: ["300", "400", "500"],
+  style: "normal",
+  variable: "--font-body",
+})
+
+const tinyFont = TinyFont({
+  subsets: ["latin"],
+  weight: ["300", "400"],
+  style: "normal",
+  variable: "--font-tiny",
 })
 
 export const metadata: Metadata = {
@@ -29,7 +74,7 @@ export default function RootLayout({
       <head>
         <MetaTags />
       </head>
-      <body className={`${font.className} `}>
+      <body className={`${bodyFont.className} ${windowGrabFont.variable} ${heroFont.variable} ${headerFont.variable} ${bodyFont.variable} ${tinyFont.variable}`}>
         <InitialLoad />
         <ToolTipProvider>
           <ControlBarProvider>

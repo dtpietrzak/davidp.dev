@@ -53,3 +53,69 @@ body {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+.font-window-grab {
+  @apply text-sm;
+  font-family: var(--font-window-grab);
+  -webkit-user-select: text;
+  -webkit-user-select: none;
+}
+
+.font-5xl {
+  @apply text-5xl;
+  font-family: var(--font-hero);
+  font-weight: 900;
+}
+
+.font-4xl {
+  @apply text-4xl;
+  font-family: var(--font-header);
+  font-weight: 600;
+}
+
+.font-3xl {
+  @apply text-3xl;
+  font-family: var(--font-header);
+  font-weight: 500;
+}
+
+.font-2xl {
+  @apply text-2xl;
+  font-family: var(--font-header);
+  font-weight: 400;
+}
+
+.font-xl {
+  @apply text-xl;
+  font-family: var(--font-body);
+  font-weight: 500;
+}
+
+.font-lg {
+  @apply text-lg;
+  font-family: var(--font-body);
+  font-weight: 400;
+}
+
+.font-md {
+  @apply text-md;
+  font-family: var(--font-body);
+  font-weight: 300;
+}
+
+.font-sm {
+  @apply text-sm;
+  font-family: var(--font-body);
+  font-weight: 400;
+}
+
+.font-xs {
+  @apply text-xs;
+  font-family: var(--font-tiny);
+  font-weight: 300;
+}
+
+.font-xxs {
+  @apply text-xxs;
+  font-family: var(--font-tiny);
+}

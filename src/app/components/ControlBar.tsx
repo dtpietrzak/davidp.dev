@@ -5,7 +5,6 @@ import { useToolTip } from "@/hooks/useToolTip"
 import { useWindowSize } from "@/hooks/useWindowSize"
 import { useClickAway } from "@/hooks/useClickAway"
 import { FC, useCallback, useEffect, useState } from "react"
-import { createRoot } from "react-dom/client"
 
 import { BiWindows, BiDotsVertical } from "react-icons/bi"
 import { IoIosApps } from "react-icons/io"
@@ -13,7 +12,8 @@ import { PiFilesDuotone } from "react-icons/pi"
 import { RiSettings3Line, RiAccountBoxLine } from "react-icons/ri"
 import { IconType } from "react-icons"
 import { flushSync } from "react-dom"
-import { FileExplorer } from "@/app/apps/FileExplorer"
+import { renderFileExplorer } from "@/app/apps/FileExplorer"
+import { renderGenericWindow } from "@/app/utils/renderGenericWindow"
 
 let timeInControlBarHitbox = 0
 
@@ -116,11 +116,15 @@ export const ControlBar = () => {
     },{
       graphicIcon: '',
       label: 'Web Browser',
-      onClick: () => {},
+      onClick: () => {
+        renderGenericWindow('Web Browser', 'web-browser', <>web stuff</>)
+      },
     },{
       graphicIcon: '',
       label: 'Text Editor',
-      onClick: () => {},
+      onClick: () => {
+        renderGenericWindow('Text Editor', 'text-editor', <></>)
+      },
     },{
       graphicIcon: '',
       label: 'Weather',
@@ -229,7 +233,7 @@ export const ControlBar = () => {
       <div 
         ref={clickAwayRef}
         className={
-          `z-30 overflow-hidden fixed ease-out select-none backdrop-blur-md border-gray-500/50 ${shouldTransition ? 'transition-all' : ''} ${ 
+          `z-3000 overflow-hidden fixed ease-out select-none backdrop-blur-md border-gray-500/50 ${shouldTransition ? 'transition-all' : ''} ${ 
             controlBarFocused ? 'shadow-[0px_0px_12px_4px_rgb(0,0,0,0.1)] bg-gray-400/30 dark:bg-gray-600/30' : 'shadow-[inset_2px_-1px_4px_rgb(0,0,0,0.05)] bg-gray-300/10 dark:bg-gray-700/10'
           } ${
             location === 'top' || location === 'bottom' ?
@@ -291,16 +295,7 @@ export const ControlBar = () => {
                 controlButtonClicked()
                 setMenuDirection(null)
                 setMenuSelected('none')
-
-
-                const fileExplorerElement = document.getElementById('file-explorer') ?? document.createElement('div')
-                fileExplorerElement.id = 'file-explorer'
-
-                const main = document.getElementById('main')
-                main?.appendChild(fileExplorerElement)
-
-                const fileExplorerComponent = createRoot(fileExplorerElement)
-                fileExplorerComponent.render(<FileExplorer />)
+                renderFileExplorer()
               }}
             />
             <IconButton 
@@ -318,7 +313,7 @@ export const ControlBar = () => {
 
       <div
         className={
-          `z-40 transition-all duration-300 fixed border hover:bg-gray-100/60 dark:hover:bg-gray-500/60 backdrop-blur-md flex justify-center items-center cursor-pointer ${controlBarFocused ? 'border-transparent bg-transparent m-0' : 'border-gray-500/50 bg-gray-200/30 dark:bg-gray-600/40 shadow-md m-[2px]'} ${
+          `z-4000 transition-all duration-300 fixed border hover:bg-gray-100/60 dark:hover:bg-gray-500/60 backdrop-blur-md flex justify-center items-center cursor-pointer ${controlBarFocused ? 'border-transparent bg-transparent m-0' : 'border-gray-500/50 bg-gray-200/30 dark:bg-gray-600/40 shadow-md m-[2px]'} ${
             location === 'top' || location === 'bottom' ?
             // top or bottom
               `${controlBarFocused ? 'w-[52px]' : 'w-[44px]'}` : 
@@ -425,7 +420,7 @@ const Menu: FC<MenuProps> = ({
 
   return (
     <div 
-      className={`flex flex-col text-sm dark:text-white text-black py-1.5 pl-1.5 pr-1 fixed z-20 h-fit max-h-full min-w-[240px] max-w-[480px] bg-gray-400/30 dark:bg-gray-600/30 backdrop-blur-md shadow-md overflow-scroll scrollbar-hide ${
+      className={`flex flex-col font-sm dark:text-white text-black py-1.5 pl-1.5 pr-1 fixed z-2000 h-fit max-h-full min-w-[240px] max-w-[480px] bg-gray-400/30 dark:bg-gray-600/30 backdrop-blur-md shadow-md overflow-scroll scrollbar-hide ${
         controlBarLocation === 'top' ? 'top-[52px] rounded-b-2xl' : ''
       } ${
         controlBarLocation === 'bottom' ? 'safe-bottom-minus-bar rounded-t-2xl' : ''
@@ -471,7 +466,7 @@ const Menu: FC<MenuProps> = ({
                   <></>
               }
               <button
-                className={`flex items-center justify-start w-full py-2 px-4 hover:bg-gray-100/60 dark:hover:bg-gray-500/60 cursor-pointer rounded-xl my-[2px] shadow-none hover:shadow`}
+                className={`flex font-sm !text-[0.9em] items-center justify-start w-full py-2 px-4 hover:bg-gray-100/60 dark:hover:bg-gray-500/60 cursor-pointer rounded-xl my-[2px] shadow-none hover:shadow`}
                 onClick={() => {
                   item.onClick()
                 }}
