@@ -39,33 +39,44 @@ export const FileExplorer = () => {
   )
 }
 
-export const initializeComponent = (
-  windowId: string,
-) => {
+type RenderWindowProps = {
+  title: string
+  windowId: string
+  component: React.ReactNode
+  userId: string
+}
+
+export const renderWindow = ({
+  title, windowId, component, userId,
+}: RenderWindowProps) => {
   const element = document.getElementById(windowId) ?? document.createElement('div')
   element.id = windowId
 
   const main = document.getElementById('main')
-  if (!main) return null
+  if (!main) return
   main.appendChild(element)
 
   const componentRoot = createRoot(element)
-  return componentRoot
-}
-
-export const openWindow() => {
-  
-}
-
-export const renderFileExplorer = () => {
-  const fileExplorerComponent = initializeComponent('file-explorer')
-  fileExplorerComponent.render(
+  componentRoot.render(
     <Window
-      title="File Explorer"
-      userId="guest"
-      windowId="file-explorer"
+      title={title}
+      windowId={windowId}
+      userId={userId}
     >
-      <FileExplorer />
+      { component }
     </Window>
   )
+}
+
+type OpenWindowOsData = {
+  userId: string
+}
+
+export const openWindow = (osData: OpenWindowOsData) => {
+  openWindow({
+    title: 'File Explorer',
+    windowId: 'file-explorer',
+    component: <FileExplorer/>,
+    {...osData}
+  })
 }
