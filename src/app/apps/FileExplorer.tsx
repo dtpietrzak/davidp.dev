@@ -2,7 +2,7 @@ import { ScrollBar } from "@/app/components/ScrollBar"
 import { Window } from "@/app/components/Window"
 import { createRoot } from "react-dom/client"
 
-export const FileExplorer = () => {
+export const FileExplorer: App = (osData) => {
   return (
     <ScrollBar>
       <h1 className="font-5xl mb-2">
@@ -42,18 +42,18 @@ export const FileExplorer = () => {
 type RenderWindowProps = {
   title: string
   windowId: string
-  component: React.ReactNode
-  userId: string
+  app: React.ReactNode
 }
 
-export const renderWindow = ({
-  title, windowId, component, userId,
-}: RenderWindowProps) => {
+export const renderWindow = (
+  { title, windowId, app }: RenderWindowProps,
+  forRender: OpenWindowOsDataForRender,
+): OpenWindowAppData | null => {
   const element = document.getElementById(windowId) ?? document.createElement('div')
   element.id = windowId
 
   const main = document.getElementById('main')
-  if (!main) return
+  if (!main) return null
   main.appendChild(element)
 
   const componentRoot = createRoot(element)
@@ -61,22 +61,47 @@ export const renderWindow = ({
     <Window
       title={title}
       windowId={windowId}
-      userId={userId}
+      userId={forRender.userId}
     >
-      { component }
+      { app }
     </Window>
   )
+
+  return {
+    title: title,
+    windowId, windowId,
+  }
 }
 
-type OpenWindowOsData = {
+type OpenWindowOsDataForApp = {
   userId: string
 }
 
-export const openWindow = (osData: OpenWindowOsData) => {
-  openWindow({
+type OpenWindowOsDataForRender = {
+  userId: string
+}
+
+type OpenWindowOsData = {
+  forApp: OpenWindowOsDataForApp
+  forRender: OpenWindowOsDataForRender
+}
+
+type OpenWindowAppData = {
+  title: string
+  windowId: string
+} | null
+
+type OpenWindow = (
+  osData: OpenWindowOsData,
+} => OpenWindowAppData
+
+export type App = FC<OpenWindowOsDataForApp>
+
+export const openWindow = ({ forApp, forRender }) => {
+  return renderWindow({
     title: 'File Explorer',
     windowId: 'file-explorer',
-    component: <FileExplorer/>,
-    {...osData}
-  })
+    app: <FileExplorer {...forApp} />,
+  }, forRender)
 }
+
