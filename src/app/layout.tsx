@@ -8,21 +8,15 @@ import {
 } from "next/font/google"
 import "./globals.css"
 
-// Karla for Window Grab Bar
-// Outfit for larger body text
-// Comfortaa for body text
+import { MetaTags } from "@/app/MetaTags"
 
-// Text Editor Fonts
-// Karla
-// Comfortaa
-// Outfit
-// Mate_SC
+import { ToolTipProvider } from "@/components/ToolTip"
 
-
-import { MetaTags } from "./components/MetaTags"
-import { ToolTipProvider } from "@/hooks/useToolTip"
-import { ControlBarProvider } from "@/hooks/useControlBar"
-import { InitialLoad } from "@/app/utils/InitialLoad"
+import { InitialLoad } from "@/os/InitialLoad"
+import { StorageProvider } from "@/os/storage"
+import { SystemProvider } from "@/os/system"
+import { WindowsProvider } from "@/os/windows"
+import { ControllerProvider } from "@/os/controller"
 
 const windowGrabFont = WindowGrabFont({
   subsets: ["latin"],
@@ -75,16 +69,22 @@ export default function RootLayout({
         <MetaTags />
       </head>
       <body className={`${bodyFont.className} ${windowGrabFont.variable} ${heroFont.variable} ${headerFont.variable} ${bodyFont.variable} ${tinyFont.variable}`}>
-        <InitialLoad />
-        <ToolTipProvider>
-          <ControlBarProvider>
-            <div id="screen" className="h-full w-full bg-repeat bg-pattern-light dark:bg-pattern-dark">
-              <div className="flex safe-h-full flex-col items-center justify-between p-24">
-                {children}
-              </div>
-            </div>
-          </ControlBarProvider>
-        </ToolTipProvider>
+        <StorageProvider>
+          <InitialLoad />
+          <SystemProvider>
+            <ToolTipProvider>
+              <WindowsProvider>
+                <ControllerProvider>
+                  <div id="screen" className="h-full w-full bg-repeat bg-pattern-light dark:bg-pattern-dark">
+                    <div className="flex safe-h-full flex-col items-center justify-between p-24">
+                      {children}
+                    </div>
+                  </div>
+                </ControllerProvider>
+              </WindowsProvider>
+            </ToolTipProvider>
+          </SystemProvider>
+        </StorageProvider>
       </body>
     </html>
   )

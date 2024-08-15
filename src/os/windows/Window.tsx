@@ -4,7 +4,6 @@ import { useEffect, useState, MouseEvent as ReactMouseEvent, useCallback, FC } f
 import { IoCloseCircle } from "react-icons/io5"
 import { useClickAway } from "@/hooks/useClickAway"
 import { RiDragMoveFill } from "react-icons/ri"
-import { ScrollBar } from "@/app/components/ScrollBar"
 
 // there is a bug in the dragging on mobile code, that caused the touchSelectedDrag to flash false/true/false at the end of a legitimate drag
 

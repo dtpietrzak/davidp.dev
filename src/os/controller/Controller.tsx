@@ -1,10 +1,9 @@
 "use client"
 
+import { FC, useCallback, useEffect, useState } from "react"
 import { useMousePosition } from "@/hooks/useMouseLocation"
-import { useToolTip } from "@/hooks/useToolTip"
 import { useWindowSize } from "@/hooks/useWindowSize"
 import { useClickAway } from "@/hooks/useClickAway"
-import { FC, useCallback, useEffect, useState } from "react"
 
 import { BiWindows, BiDotsVertical } from "react-icons/bi"
 import { IoIosApps } from "react-icons/io"
@@ -12,10 +11,11 @@ import { PiFilesDuotone } from "react-icons/pi"
 import { RiSettings3Line, RiAccountBoxLine } from "react-icons/ri"
 import { IconType } from "react-icons"
 import { flushSync } from "react-dom"
-import { renderFileExplorer } from "@/app/apps/FileExplorer"
-import { renderGenericWindow } from "@/app/utils/renderGenericWindow"
 
-let timeInControlBarHitbox = 0
+import { useToolTip } from "@/components/ToolTip"
+import { renderGenericWindow, useWindows } from "@/os/windows"
+
+let timeInControllerHitbox = 0
 
 type VerticalLocation = 'top' | 'bottom'
 type HorizontalLocation = 'left' | 'right'
@@ -24,39 +24,45 @@ type BiLocation = 'top-left' | 'bottom-right'
 
 type Location = VerticalLocation | HorizontalLocation
 
-type ControlBarOptions = {
+type ControllerOptions = {
   location: Location
 }
 
-const locationsArray: ControlBarOptions['location'][] = ['right', 'left', 'top', 'bottom']
+const locationsArray: ControllerOptions['location'][] = ['right', 'left', 'top', 'bottom']
 
-export const ControlBar = () => {
+export const Controller = () => {
   const { x, y } = useMousePosition()
   const { openToolTip, closeToolTip } = useToolTip()
   const { width, height } = useWindowSize()
   
   const [mouseInControlHandle, setMouseInControlHandle] = useState(false)
-  const [mouseInControlBar, setMouseInControlBar] = useState(false)
+  const [mouseInController, setMouseInController] = useState(false)
   const [mouseInMenu, setMouseInMenu] = useState(false)
 
-  const [controlBarFocused, setControlBarFocused] = useState(false)
+  const [controllerFocused, setControllerFocused] = useState(false)
   const [shouldTransition, setShouldTransition] = useState(false)
   const [temp, setTemp] = useState(0)
   const [location, setLocation] = 
-    useState<ControlBarOptions['location']>(locationsArray[temp])
+    useState<ControllerOptions['location']>(locationsArray[temp])
 
   const [menuDirection, setMenuDirection] = useState<BiLocation | null>(null)
   const [menuSelected, setMenuSelected] = 
     useState<keyof typeof menuItems>('none')
 
+  const windows = useWindows()
+
+  const [osData, setOsData] = useState({
+    userId: 'guest',
+  })
+
   const clickAwayRef = useClickAway(() => {
-    if (controlBarFocused && (
+    if (controllerFocused && (
       location === 'top' && y > 52 ||
         location === 'bottom' && y < height - 52 ||
         location === 'left' && x > 52 ||
         location === 'right' && x < width - 52
     )) {
-      setTimeout(() => { closeControlBar() }, 200)
+      setTimeout(() => { closeController() }, 200)
     }
   })
 
@@ -87,7 +93,7 @@ export const ControlBar = () => {
       label: 'Control Bar Location',
       onClick: () => {
         flushSync(() => {
-          closeControlBar()
+          closeController()
           setShouldTransition(false)
         })
         setTemp((prev) => {
@@ -153,63 +159,63 @@ export const ControlBar = () => {
     setShouldTransition(true)
   }, [location])
 
-  const closeControlBar = useCallback(() => {
-    timeInControlBarHitbox = 0
-    setControlBarFocused(false)
+  const closeController = useCallback(() => {
+    timeInControllerHitbox = 0
+    setControllerFocused(false)
     setMouseInControlHandle(false)
-    setMouseInControlBar(false)
+    setMouseInController(false)
     setMouseInMenu(false)
     setMenuDirection(null)
   }, [])
 
   const controlButtonClicked = () => {
-    setMouseInControlBar(true)
-    setControlBarFocused(true)
+    setMouseInController(true)
+    setControllerFocused(true)
   }
 
-  const handleControlBarFocused = useCallback((
+  const handleControllerFocused = useCallback((
     relativeMousePosition: number,
     _mouseInside: boolean,
   ) => {
-    if (!controlBarFocused) {
+    if (!controllerFocused) {
       if (_mouseInside) {
-        timeInControlBarHitbox = 5
-        setControlBarFocused(true)
+        timeInControllerHitbox = 5
+        setControllerFocused(true)
       } else if ((relativeMousePosition >= 0 && relativeMousePosition < 10)) {
-        if (timeInControlBarHitbox > 5) setControlBarFocused(true)
-        else timeInControlBarHitbox++
+        if (timeInControllerHitbox > 5) setControllerFocused(true)
+        else timeInControllerHitbox++
       } else {
-        closeControlBar()
+        closeController()
       }
     } else {
       if ((relativeMousePosition >= 0 && relativeMousePosition < 52) || _mouseInside) {
-        if (timeInControlBarHitbox > 5) setControlBarFocused(true)
-        else timeInControlBarHitbox++
+        if (timeInControllerHitbox > 5) setControllerFocused(true)
+        else timeInControllerHitbox++
       } else {
-        closeControlBar()
+        closeController()
       }
     }
-  }, [closeControlBar, controlBarFocused])
+  }, [closeController, controllerFocused])
 
   const logicClockCallback = useCallback(() => {
-    const mouseInside = mouseInControlHandle || mouseInControlBar || mouseInMenu
+    const mouseInside = mouseInControlHandle || mouseInController || mouseInMenu
 
     switch (location) {
       case 'top':
-        handleControlBarFocused(y, mouseInside)
+        handleControllerFocused(y, mouseInside)
         break
       case 'bottom':
-        handleControlBarFocused(height - y, mouseInside)
+        handleControllerFocused(height - y, mouseInside)
         break
       case 'left':
-        handleControlBarFocused(x, mouseInside)
+        handleControllerFocused(x, mouseInside)
         break
       case 'right':
-        handleControlBarFocused(width - x, mouseInside)
+        handleControllerFocused(width - x, mouseInside)
         break
     }
     
-  }, [handleControlBarFocused, mouseInControlHandle, mouseInControlBar, mouseInMenu, height, location, width, x, y])
+  }, [handleControllerFocused, mouseInControlHandle, mouseInController, mouseInMenu, height, location, width, x, y])
 
   useEffect(() => {
     const intervalId = setInterval(logicClockCallback, 33)
@@ -219,14 +225,14 @@ export const ControlBar = () => {
   useEffect(() => {
     const handleResize = () => {
       if (shouldTransition) setShouldTransition(false)
-      if (controlBarFocused) closeControlBar()
+      if (controllerFocused) closeController()
       setTimeout(() => {
         setShouldTransition(true)
       }, 500)
     }
     addEventListener('resize', handleResize)
     return () => removeEventListener('resize', handleResize)
-  }, [closeControlBar, controlBarFocused, shouldTransition])
+  }, [closeController, controllerFocused, shouldTransition])
 
   return (
     <>
@@ -234,13 +240,13 @@ export const ControlBar = () => {
         ref={clickAwayRef}
         className={
           `z-3000 overflow-hidden fixed ease-out select-none backdrop-blur-md border-gray-500/50 ${shouldTransition ? 'transition-all' : ''} ${ 
-            controlBarFocused ? 'shadow-[0px_0px_12px_4px_rgb(0,0,0,0.1)] bg-gray-400/30 dark:bg-gray-600/30' : 'shadow-[inset_2px_-1px_4px_rgb(0,0,0,0.05)] bg-gray-300/10 dark:bg-gray-700/10'
+            controllerFocused ? 'shadow-[0px_0px_12px_4px_rgb(0,0,0,0.1)] bg-gray-400/30 dark:bg-gray-600/30' : 'shadow-[inset_2px_-1px_4px_rgb(0,0,0,0.05)] bg-gray-300/10 dark:bg-gray-700/10'
           } ${
             location === 'top' || location === 'bottom' ?
             // top or bottom
-              `w-full ${ controlBarFocused ? 'h-[52px]' : 'h-[11px]' }` : 
+              `w-full ${ controllerFocused ? 'h-[52px]' : 'h-[11px]' }` : 
             // left or right
-              `safe-h-full ${ controlBarFocused ? 'w-[52px]' : 'w-[11px]' }` 
+              `safe-h-full ${ controllerFocused ? 'w-[52px]' : 'w-[11px]' }` 
           } ${
             location === 'top' ? 'border-b top-0' : ''
           }${
@@ -252,25 +258,25 @@ export const ControlBar = () => {
           }`
         }
         onMouseEnter={() => {
-          setMouseInControlBar(true)
+          setMouseInController(true)
         }}
         onMouseLeave={() => {
-          setMouseInControlBar(false)
+          setMouseInController(false)
         }}
         onClick={() => {
-          setMouseInControlBar(true)
+          setMouseInController(true)
         }}
       >
         <div 
           className={`flex w-full h-full justify-between items-center ${
             location === 'top' || location === 'bottom' ? 'flex-row' : 'flex-col'
-          } ${ controlBarFocused ? 'opacity-100' : 'opacity-50' }`}
+          } ${ controllerFocused ? 'opacity-100' : 'opacity-50' }`}
         >
           <div className={`${
             location === 'top' || location === 'bottom' ? 'flex' : 'flex-col'
           }`}>
             <IconButton 
-              Icon={RiAccountBoxLine} controlBarFocused={controlBarFocused}
+              Icon={RiAccountBoxLine} controllerFocused={controllerFocused}
               onClick={() => {
                 controlButtonClicked()
                 setMenuDirection('top-left')
@@ -278,7 +284,7 @@ export const ControlBar = () => {
               }}
             />
             <IconButton 
-              Icon={RiSettings3Line} controlBarFocused={controlBarFocused}
+              Icon={RiSettings3Line} controllerFocused={controllerFocused}
               onClick={() => {
                 controlButtonClicked()
                 setMenuDirection('top-left')
@@ -290,16 +296,16 @@ export const ControlBar = () => {
             location === 'top' || location === 'bottom' ? 'flex flex-row' : 'flex flex-col'
           }`}>
             <IconButton 
-              Icon={PiFilesDuotone} controlBarFocused={controlBarFocused}
+              Icon={PiFilesDuotone} controllerFocused={controllerFocused}
               onClick={() => {
                 controlButtonClicked()
                 setMenuDirection(null)
                 setMenuSelected('none')
-                renderFileExplorer()
+                windows.openWindow('file_explorer', osData)
               }}
             />
             <IconButton 
-              Icon={IoIosApps} controlBarFocused={controlBarFocused}
+              Icon={IoIosApps} controllerFocused={controllerFocused}
               onClick={() => {
                 controlButtonClicked()
                 setMenuDirection('bottom-right')
@@ -313,20 +319,20 @@ export const ControlBar = () => {
 
       <div
         className={
-          `z-4000 transition-all duration-300 fixed border hover:bg-gray-100/60 dark:hover:bg-gray-500/60 backdrop-blur-md flex justify-center items-center cursor-pointer ${controlBarFocused ? 'border-transparent bg-transparent m-0' : 'border-gray-500/50 bg-gray-200/30 dark:bg-gray-600/40 shadow-md m-[2px]'} ${
+          `z-4000 transition-all duration-300 fixed border hover:bg-gray-100/60 dark:hover:bg-gray-500/60 backdrop-blur-md flex justify-center items-center cursor-pointer ${controllerFocused ? 'border-transparent bg-transparent m-0' : 'border-gray-500/50 bg-gray-200/30 dark:bg-gray-600/40 shadow-md m-[2px]'} ${
             location === 'top' || location === 'bottom' ?
             // top or bottom
-              `${controlBarFocused ? 'w-[52px]' : 'w-[44px]'}` : 
+              `${controllerFocused ? 'w-[52px]' : 'w-[44px]'}` : 
             // left or right
-              `${controlBarFocused ? 'h-[52px]' : 'h-[44px]'}` 
+              `${controllerFocused ? 'h-[52px]' : 'h-[44px]'}` 
           } ${
-            location === 'top' ? `top-0 right-0 ${controlBarFocused ? 'rounded-none h-[51px]' : 'rounded-[22px] h-[44px]'}` : ''
+            location === 'top' ? `top-0 right-0 ${controllerFocused ? 'rounded-none h-[51px]' : 'rounded-[22px] h-[44px]'}` : ''
           }${
-            location === 'bottom' ? `safe-bottom right-0 ${controlBarFocused ? 'rounded-none h-[51px]' : 'rounded-[22px] h-[44px]'}` : ''
+            location === 'bottom' ? `safe-bottom right-0 ${controllerFocused ? 'rounded-none h-[51px]' : 'rounded-[22px] h-[44px]'}` : ''
           }${
-            location === 'left' ? `left-0 safe-bottom ${controlBarFocused ? 'rounded-none w-[51px]' : 'rounded-[22px] w-[44px]'}` : ''
+            location === 'left' ? `left-0 safe-bottom ${controllerFocused ? 'rounded-none w-[51px]' : 'rounded-[22px] w-[44px]'}` : ''
           }${
-            location === 'right' ? `right-0 safe-bottom ${controlBarFocused ? 'rounded-none w-[51px]' : 'rounded-[22px] w-[44px]'}` : ''
+            location === 'right' ? `right-0 safe-bottom ${controllerFocused ? 'rounded-none w-[51px]' : 'rounded-[22px] w-[44px]'}` : ''
           }`
         }
         onMouseEnter={() => {
@@ -336,17 +342,17 @@ export const ControlBar = () => {
           setMouseInControlHandle(false)
         }}
         onClick={() => {
-          if (controlBarFocused) {
+          if (controllerFocused) {
             controlButtonClicked()
             setMenuDirection('bottom-right')
             setMenuSelected('windows')
           }
 
-          setControlBarFocused(true)
+          setControllerFocused(true)
         }}
       >
         {
-          controlBarFocused ? 
+          controllerFocused ? 
             <BiWindows 
               className={`dark:text-white text-black drop-shadow-[0px_0px_5px_rgba(255,255,255,0.25)]`} size={24}
             /> : 
@@ -357,7 +363,7 @@ export const ControlBar = () => {
       </div>
       <Menu 
         direction={menuDirection}
-        controlBarLocation={location}
+        controllerLocation={location}
         items={menuItems[menuSelected]}
         onMouseEnter={() => {
           setMouseInMenu(true)
@@ -372,18 +378,18 @@ export const ControlBar = () => {
 
 type IconButtonProps = {
   Icon: IconType
-  controlBarFocused: boolean
+  controllerFocused: boolean
   onClick: () => void
   size?: number
 }
 
 const IconButton: FC<IconButtonProps> = ({
   Icon,
-  controlBarFocused,
+  controllerFocused,
   onClick,
   size,
 }) => {
-  const iconSize = () => (controlBarFocused ? 24 : 12)
+  const iconSize = () => (controllerFocused ? 24 : 12)
   const iconColor = () => `dark:text-white text-black`
 
   return (
@@ -403,7 +409,7 @@ type MenuItem = {
 
 type MenuProps = {
   direction: BiLocation | null
-  controlBarLocation: ControlBarOptions['location']
+  controllerLocation: ControllerOptions['location']
   items: MenuItem[]
   onMouseEnter?: () => void
   onMouseLeave?: () => void
@@ -411,7 +417,7 @@ type MenuProps = {
 
 const Menu: FC<MenuProps> = ({
   direction,
-  controlBarLocation,
+  controllerLocation,
   items,
   onMouseEnter,
   onMouseLeave,
@@ -421,31 +427,31 @@ const Menu: FC<MenuProps> = ({
   return (
     <div 
       className={`flex flex-col font-sm dark:text-white text-black py-1.5 pl-1.5 pr-1 fixed z-2000 h-fit max-h-full min-w-[240px] max-w-[480px] bg-gray-400/30 dark:bg-gray-600/30 backdrop-blur-md shadow-md overflow-scroll scrollbar-hide ${
-        controlBarLocation === 'top' ? 'top-[52px] rounded-b-2xl' : ''
+        controllerLocation === 'top' ? 'top-[52px] rounded-b-2xl' : ''
       } ${
-        controlBarLocation === 'bottom' ? 'safe-bottom-minus-bar rounded-t-2xl' : ''
+        controllerLocation === 'bottom' ? 'safe-bottom-minus-bar rounded-t-2xl' : ''
       } ${
-        controlBarLocation === 'left' ? 'left-[52px] rounded-r-2xl' : ''
+        controllerLocation === 'left' ? 'left-[52px] rounded-r-2xl' : ''
       } ${
-        controlBarLocation === 'right' ? 'right-[52px] rounded-l-2xl' : ''
+        controllerLocation === 'right' ? 'right-[52px] rounded-l-2xl' : ''
       } ${
         (
-          (controlBarLocation === 'top' || controlBarLocation === 'bottom') &&
+          (controllerLocation === 'top' || controllerLocation === 'bottom') &&
           direction === 'top-left'
         ) ? 'left-0' : ''
       } ${
         (
-          (controlBarLocation === 'top' || controlBarLocation === 'bottom') &&
+          (controllerLocation === 'top' || controllerLocation === 'bottom') &&
           direction === 'bottom-right'
         ) ? 'right-0' : ''
       } ${
         (
-          (controlBarLocation === 'left' || controlBarLocation === 'right') &&
+          (controllerLocation === 'left' || controllerLocation === 'right') &&
           direction === 'top-left'
         ) ? 'top-0' : ''
       } ${
         (
-          (controlBarLocation === 'left' || controlBarLocation === 'right') &&
+          (controllerLocation === 'left' || controllerLocation === 'right') &&
           direction === 'bottom-right'
         ) ? 'safe-bottom' : ''
       }`}

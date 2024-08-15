@@ -1,8 +1,17 @@
-import { ScrollBar } from "@/app/components/ScrollBar"
-import { Window } from "@/app/components/Window"
-import { createRoot } from "react-dom/client"
+import { ScrollBar } from "@/components/ScrollBar"
+import { App, OpenWindow, renderWindow } from "@/os/windows"
 
-export const FileExplorer: App = (osData) => {
+export const openFileExplorer: OpenWindow = ({ 
+  forApp, forRender, 
+}) => {
+  return renderWindow({
+    title: 'File Explorer',
+    windowId: 'file-explorer',
+    app: <FileExplorer {...forApp} />,
+  }, forRender)
+}
+
+const FileExplorer: App = (osData) => {
   return (
     <ScrollBar>
       <h1 className="font-5xl mb-2">
@@ -38,70 +47,3 @@ export const FileExplorer: App = (osData) => {
     </ScrollBar>
   )
 }
-
-type RenderWindowProps = {
-  title: string
-  windowId: string
-  app: React.ReactNode
-}
-
-export const renderWindow = (
-  { title, windowId, app }: RenderWindowProps,
-  forRender: OpenWindowOsDataForRender,
-): OpenWindowAppData | null => {
-  const element = document.getElementById(windowId) ?? document.createElement('div')
-  element.id = windowId
-
-  const main = document.getElementById('main')
-  if (!main) return null
-  main.appendChild(element)
-
-  const componentRoot = createRoot(element)
-  componentRoot.render(
-    <Window
-      title={title}
-      windowId={windowId}
-      userId={forRender.userId}
-    >
-      { app }
-    </Window>
-  )
-
-  return {
-    title: title,
-    windowId, windowId,
-  }
-}
-
-type OpenWindowOsDataForApp = {
-  userId: string
-}
-
-type OpenWindowOsDataForRender = {
-  userId: string
-}
-
-type OpenWindowOsData = {
-  forApp: OpenWindowOsDataForApp
-  forRender: OpenWindowOsDataForRender
-}
-
-type OpenWindowAppData = {
-  title: string
-  windowId: string
-} | null
-
-type OpenWindow = (
-  osData: OpenWindowOsData,
-} => OpenWindowAppData
-
-export type App = FC<OpenWindowOsDataForApp>
-
-export const openWindow_FileExplorer = ({ forApp, forRender }) => {
-  return renderWindow({
-    title: 'File Explorer',
-    windowId: 'file-explorer',
-    app: <FileExplorer {...forApp} />,
-  }, forRender)
-}
-
