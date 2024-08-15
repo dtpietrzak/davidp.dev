@@ -1,8 +1,58 @@
-import { openFileExplorer } from "@/apps/FileExplorer"
-import { OpenWindowOsData } from "@/os/windows/types"
+"use client"
+
+import { createRoot } from "react-dom/client"
+
+import { 
+  OpenWindow,
+  OpenWindowAppData,
+  OpenWindowOsData,
+  RenderWindowProps,
+} from "@/os/windows/types"
+
+import { Window } from "@/os/windows/Window"
+import { openFileExplorer } from "@/apps/FileExplorer/app"
+
+export const renderWindow = (
+  { title, windowId, app }: RenderWindowProps,
+  forRender: OpenWindowOsData['forRender'],
+): OpenWindowAppData | null => {
+  const element = document.getElementById(windowId) ?? document.createElement('div')
+  element.id = windowId
+
+  const main = document.getElementById('main')
+  if (!main) return null
+  main.appendChild(element)
+
+  const componentRoot = createRoot(element)
+  componentRoot.render(
+    <Window
+      title={title}
+      windowId={windowId}
+      userId={forRender.userId}
+    >
+      { app }
+    </Window>
+  )
+
+  return {
+    title: title,
+    windowId: windowId,
+  }
+}
+
+const openGenericWindow: OpenWindow = (osData) => {
+  return renderWindow({
+    title: 'Generic Window',
+    windowId: 'generic-window',
+    app: <></>,
+  }, osData.forRender)
+}
 
 const apps = {
-  file_explorer: openFileExplorer,
+  'file-explorer': openFileExplorer,
+  'web-browser': openGenericWindow,
+  'text-editor': openGenericWindow,
+  'system-information': openGenericWindow,
 } as const
 
 type AppName = keyof typeof apps

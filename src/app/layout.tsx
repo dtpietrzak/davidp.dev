@@ -14,7 +14,6 @@ import { ToolTipProvider } from "@/components/ToolTip"
 
 import { InitialLoad } from "@/os/InitialLoad"
 import { StorageProvider } from "@/os/storage"
-import { SystemProvider } from "@/os/system"
 import { WindowsProvider } from "@/os/windows"
 import { ControllerProvider } from "@/os/controller"
 
@@ -71,19 +70,17 @@ export default function RootLayout({
       <body className={`${bodyFont.className} ${windowGrabFont.variable} ${heroFont.variable} ${headerFont.variable} ${bodyFont.variable} ${tinyFont.variable}`}>
         <StorageProvider>
           <InitialLoad />
-          <SystemProvider>
-            <ToolTipProvider>
-              <WindowsProvider>
-                <ControllerProvider>
-                  <div id="screen" className="h-full w-full bg-repeat bg-pattern-light dark:bg-pattern-dark">
-                    <div className="flex safe-h-full flex-col items-center justify-between p-24">
-                      {children}
-                    </div>
+          <ToolTipProvider>
+            <WindowsProvider>
+              <ControllerProvider>
+                <div id="screen" className="h-full w-full bg-repeat bg-pattern-light dark:bg-pattern-dark">
+                  <div className="flex safe-h-full flex-col items-center justify-between p-24">
+                    {children}
                   </div>
-                </ControllerProvider>
-              </WindowsProvider>
-            </ToolTipProvider>
-          </SystemProvider>
+                </div>
+              </ControllerProvider>
+            </WindowsProvider>
+          </ToolTipProvider>
         </StorageProvider>
       </body>
     </html>

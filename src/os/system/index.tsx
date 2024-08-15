@@ -1,3 +1,3 @@
-import { useSystem, SystemProvider } from "@/os/system/useSystem"
+import { useSystem } from "@/os/system/useSystem"
 
-export { useSystem, SystemProvider }
+export { useSystem }

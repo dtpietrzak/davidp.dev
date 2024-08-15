@@ -1,8 +1,15 @@
 import { ScrollBar } from "@/components/ScrollBar"
 import { App, OpenWindow, renderWindow } from "@/os/windows"
+// import { Application } from "@/os/apps"
 
-export const openFileExplorer: OpenWindow = ({ 
-  forApp, forRender, 
+// export const App: Application = {
+//   title: 'File Explorer',
+//   multiInstance: false,
+//   app: (osData) => <FileExplorer />,
+// }
+
+export const openFileExplorer: OpenWindow = ({
+  forApp, forRender,
 }) => {
   return renderWindow({
     title: 'File Explorer',

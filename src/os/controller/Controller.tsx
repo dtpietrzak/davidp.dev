@@ -13,7 +13,8 @@ import { IconType } from "react-icons"
 import { flushSync } from "react-dom"
 
 import { useToolTip } from "@/components/ToolTip"
-import { renderGenericWindow, useWindows } from "@/os/windows"
+import { useWindows } from "@/os/windows"
+import { useApps } from "@/os/apps"
 
 let timeInControllerHitbox = 0
 
@@ -31,6 +32,7 @@ type ControllerOptions = {
 const locationsArray: ControllerOptions['location'][] = ['right', 'left', 'top', 'bottom']
 
 export const Controller = () => {
+  const { appsArr } = useApps()
   const { x, y } = useMousePosition()
   const { openToolTip, closeToolTip } = useToolTip()
   const { width, height } = useWindowSize()
@@ -70,8 +72,9 @@ export const Controller = () => {
   const menuItems: Record<string, MenuItem[]> = {
     none: [],
     settings: [{
-      graphicIcon: '',
-      label: 'Light / Dark Theme',
+      icon: '',
+      title: 'Light / Dark Theme',
+      menuId: 'light-dark-theme',
       onClick: () => {
         const theme = localStorage.getItem('theme')
         if (theme) {
@@ -90,8 +93,9 @@ export const Controller = () => {
         }
       },
     },{
-      graphicIcon: '',
-      label: 'Control Bar Location',
+      icon: '',
+      title: 'Control Bar Location',
+      menuId: 'control-bar-location',
       onClick: () => {
         flushSync(() => {
           closeController()
@@ -104,56 +108,25 @@ export const Controller = () => {
       },
     }],
     account: [{
-      graphicIcon: '',
-      label: 'Log Out',
+      icon: '',
+      title: 'Log Out',
+      menuId: 'log-out',
       onClick: () => {},
     },{
-      graphicIcon: '',
-      label: 'Profile',
+      icon: '',
+      title: 'Profile',
+      menuId: 'profile',
       onClick: () => {},
     }],
-    apps: [{
-      graphicIcon: '',
-      label: 'Node-ish',
-      onClick: () => {},
-    },{
-      graphicIcon: '',
-      label: 'App Builder',
-      onClick: () => {},
-    },{
-      graphicIcon: '',
-      label: 'Web Browser',
+    apps: appsArr.map((app) => ({
+      icon: '',
+      title: app.title,
+      menuId: app.appId,
       onClick: () => {
-        renderGenericWindow('Web Browser', 'web-browser', <>web stuff</>)
+        windows.openWindow(app.appId, osData)
       },
-    },{
-      graphicIcon: '',
-      label: 'Text Editor',
-      onClick: () => {
-        renderGenericWindow('Text Editor', 'text-editor', <></>)
-      },
-    },{
-      graphicIcon: '',
-      label: 'Weather',
-      onClick: () => {},
-    },{
-      graphicIcon: '',
-      label: 'System Information',
-      onClick: () => {},
-    }],
-    windows: [{
-      graphicIcon: '',
-      label: 'Node-ish',
-      onClick: () => {},
-    },{
-      graphicIcon: '',
-      label: 'Web Browser',
-      onClick: () => {},
-    },{
-      graphicIcon: '',
-      label: 'Text Editor',
-      onClick: () => {},
-    }],
+    })),
+    windows: []
   }
 
   useEffect(() => {
@@ -302,7 +275,7 @@ export const Controller = () => {
                 controlButtonClicked()
                 setMenuDirection(null)
                 setMenuSelected('none')
-                windows.openWindow('file_explorer', osData)
+                windows.openWindow('file-explorer', osData)
               }}
             />
             <IconButton 
@@ -365,6 +338,7 @@ export const Controller = () => {
       <Menu 
         direction={menuDirection}
         controllerLocation={location}
+        menuSelected={menuSelected}
         items={menuItems[menuSelected]}
         onMouseEnter={() => {
           setMouseInMenu(true)
@@ -403,14 +377,16 @@ const IconButton: FC<IconButtonProps> = ({
 }
 
 type MenuItem = {
-  graphicIcon: string
-  label: string
+  icon: string
+  title: string
+  menuId: string
   onClick: () => void
 }
 
 type MenuProps = {
   direction: BiLocation | null
   controllerLocation: ControllerOptions['location']
+  menuSelected: string
   items: MenuItem[]
   onMouseEnter?: () => void
   onMouseLeave?: () => void
@@ -419,11 +395,19 @@ type MenuProps = {
 const Menu: FC<MenuProps> = ({
   direction,
   controllerLocation,
+  menuSelected,
   items,
   onMouseEnter,
   onMouseLeave,
 }) => {
   if (!direction) return null
+
+  let emptyWindows = false
+
+  if (items.length === 0) {
+    if (menuSelected === 'windows') emptyWindows = true
+    else return null
+  }
 
   return (
     <div 
@@ -460,29 +444,32 @@ const Menu: FC<MenuProps> = ({
       onMouseLeave={onMouseLeave}
     >
       {
-        items.map((item, index) => {
-          return (
-            <div
-              key={item.label}
-            >
-              {
-                index !== 0 ?
-                  <div className="w-full flex justify-center items-center">
-                    <div className="bg-gray-500/20 dark:bg-gray-500/20 w-[calc(100%-24px)] h-[1px]" />
-                  </div> :
-                  <></>
-              }
-              <button
-                className={`flex font-sm !text-[0.9em] items-center justify-start w-full py-2 px-4 hover:bg-gray-100/60 dark:hover:bg-gray-500/60 cursor-pointer rounded-xl my-[2px] shadow-none hover:shadow`}
-                onClick={() => {
-                  item.onClick()
-                }}
-              >
-                {item.label}
-              </button>
-            </div>
-          )
-        })
+        emptyWindows ? 
+          <div className="flex justify-center items-center w-full h-8">
+            <p className="font-sm opacity-70">No Windows Open</p>
+          </div> 
+          :
+          items.map((item, index) => {
+            return (
+              <div key={item.menuId}>
+                {
+                  index !== 0 ?
+                    <div className="w-full flex justify-center items-center">
+                      <div className="bg-gray-500/20 dark:bg-gray-500/20 w-[calc(100%-24px)] h-[1px]" />
+                    </div> :
+                    <></>
+                }
+                <button
+                  className={`flex font-sm !text-[0.9em] items-center justify-start w-full py-2 px-4 hover:bg-gray-100/60 dark:hover:bg-gray-500/60 cursor-pointer rounded-xl my-[2px] shadow-none hover:shadow`}
+                  onClick={() => {
+                    item.onClick()
+                  }}
+                >
+                  {item.title}
+                </button>
+              </div>
+            )
+          })
       }
     </div>
   )
