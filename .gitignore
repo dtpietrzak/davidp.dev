@@ -37,7 +37,7 @@ yarn-error.log*
 next-env.d.ts
 
 
-public/sw.js
-public/sw.js.map
-public/workbox*
-public/workbox*
+/public/sw.js
+/public/sw.js.map
+/public/workbox*
+/public/workbox*
