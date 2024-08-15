@@ -1,8 +1,10 @@
 "use client"
 
-import { useEffect, useState, MouseEvent as ReactMouseEvent, useCallback, FC } from "react"
+import { useEffect, useState, MouseEvent as ReactMouseEvent, useCallback, FC, useRef } from "react"
 import { IoCloseCircle } from "react-icons/io5"
-import { useClickAway } from "@/hooks/useClickAway"
+
+import { useClickAway } from "react-use"
+
 import { RiDragMoveFill } from "react-icons/ri"
 
 // there is a bug in the dragging on mobile code, that caused the touchSelectedDrag to flash false/true/false at the end of a legitimate drag
@@ -74,23 +76,28 @@ export const Window: FC<WindowProps> = ({
   const [touchSelectedDrag, setTouchSelectedDrag] = useState(false)
   const [touchSelectedResize, setTouchSelectedResize] = useState<ResizeDirections | null>(null)
 
-  const dragBarClickawayRef = useClickAway(() => {
+  const dragBarClickawayRef = useRef(null)
+  useClickAway(dragBarClickawayRef, () => {
     setTouchSelectedDrag(false)
   })
 
-  const neResizeClickawayRef = useClickAway(() => {
+  const neResizeClickawayRef = useRef(null)
+  useClickAway(neResizeClickawayRef, () => {
     setTouchSelectedResize(null)
   })
 
-  const nwResizeClickawayRef = useClickAway(() => {
+  const nwResizeClickawayRef = useRef(null)
+  useClickAway(nwResizeClickawayRef, () => {
     setTouchSelectedResize(null)
   })
 
-  const seResizeClickawayRef = useClickAway(() => {
+  const seResizeClickawayRef = useRef(null)
+  useClickAway(seResizeClickawayRef, () => {
     setTouchSelectedResize(null)
   })
 
-  const swResizeClickawayRef = useClickAway(() => {
+  const swResizeClickawayRef = useRef(null)
+  useClickAway(swResizeClickawayRef, () => {
     setTouchSelectedResize(null)
   })
 

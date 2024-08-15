@@ -1,9 +1,9 @@
 "use client"
 
-import { FC, useCallback, useEffect, useState } from "react"
-import { useMousePosition } from "@/hooks/useMouseLocation"
-import { useWindowSize } from "@/hooks/useWindowSize"
-import { useClickAway } from "@/hooks/useClickAway"
+import { FC, useCallback, useEffect, useRef, useState } from "react"
+
+import { useClickAway, useWindowSize } from 'react-use'
+import { useMousePosition } from "@/hooks/useMousePosition"
 
 import { BiWindows, BiDotsVertical } from "react-icons/bi"
 import { IoIosApps } from "react-icons/io"
@@ -55,7 +55,8 @@ export const Controller = () => {
     userId: 'guest',
   })
 
-  const clickAwayRef = useClickAway(() => {
+  const clickAwayRef = useRef(null)
+  useClickAway(clickAwayRef, () => {
     if (controllerFocused && (
       location === 'top' && y > 52 ||
         location === 'bottom' && y < height - 52 ||
