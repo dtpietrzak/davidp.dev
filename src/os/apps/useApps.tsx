@@ -32,15 +32,6 @@ export const useApps = () => {
       delete draft[appId]
     })
   }
-
-  if (typeof window !== "undefined") {
-    // @ts-ignore
-    window.__direct = {
-      apps: get,
-      addApp: addApp,
-      removeApp: removeApp,
-    }
-  }
   
   return {
     appsObj: get,

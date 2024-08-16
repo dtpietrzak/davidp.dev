@@ -119,3 +119,24 @@ body {
   @apply text-xxs;
   font-family: var(--font-tiny);
 }
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.8;
+  }
+  15% {
+    opacity: 0.9;
+  }
+  30% {
+    opacity: 0.77;
+  }
+  40% {
+    opacity: 0.77;
+  }
+  50% {
+    opacity: 0.87;
+  }
+  65% {
+    opacity: 0.8;
+  }
+}

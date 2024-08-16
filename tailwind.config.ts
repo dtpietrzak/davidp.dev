@@ -14,6 +14,12 @@ const config: Config = {
         'pattern-light': "url('/background-light.svg')",
         'pattern-dark': "url('/background-dark.svg')",
       },
+      animation: {
+        'pulse': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+      },
+      grayscale: {
+        20: '20%',
+      },
     },
     fontSize: {
       xxs: '0.5rem',
@@ -34,7 +40,7 @@ const config: Config = {
       '3000': '3000',
       '4000': '4000',
       '5000': '5000',
-    }
+    },
   },
   plugins: [],
 }

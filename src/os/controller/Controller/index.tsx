@@ -1,7 +1,6 @@
 "use client"
 
-import { FC, useCallback, useEffect, useRef, useState } from "react"
-
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useClickAway, useWindowSize } from 'react-use'
 import { useMousePosition } from "@/hooks/useMousePosition"
 
@@ -9,25 +8,18 @@ import { BiWindows, BiDotsVertical } from "react-icons/bi"
 import { IoIosApps } from "react-icons/io"
 import { PiFilesDuotone } from "react-icons/pi"
 import { RiSettings3Line, RiAccountBoxLine } from "react-icons/ri"
-import { IconType } from "react-icons"
 import { flushSync } from "react-dom"
 
 import { useToolTip } from "@/components/ToolTip"
 import { useWindows } from "@/os/windows"
 import { useApps } from "@/os/apps"
+import { ControllerButton } from "@/os/controller/Controller/ControllerButton"
+import { Menu, MenuItem } from "@/os/controller/Controller/Menu"
+import { ControllerBiLocation, ControllerOptions } from "@/os/controller/Controller/types"
 
 let timeInControllerHitbox = 0
 
-type VerticalLocation = 'top' | 'bottom'
-type HorizontalLocation = 'left' | 'right'
 
-type BiLocation = 'top-left' | 'bottom-right'
-
-type Location = VerticalLocation | HorizontalLocation
-
-type ControllerOptions = {
-  location: Location
-}
 
 const locationsArray: ControllerOptions['location'][] = ['right', 'left', 'top', 'bottom']
 
@@ -47,7 +39,8 @@ export const Controller = () => {
   const [location, setLocation] = 
     useState<ControllerOptions['location']>(locationsArray[temp])
 
-  const [menuDirection, setMenuDirection] = useState<BiLocation | null>(null)
+  const [menuDirection, setMenuDirection] = 
+    useState<ControllerBiLocation | null>(null)
   const [menuSelected, setMenuSelected] = 
     useState<keyof typeof menuItems>('none')
 
@@ -249,7 +242,7 @@ export const Controller = () => {
           <div className={`${
             location === 'top' || location === 'bottom' ? 'flex' : 'flex-col'
           }`}>
-            <IconButton 
+            <ControllerButton 
               Icon={RiAccountBoxLine} controllerFocused={controllerFocused}
               onClick={() => {
                 controlButtonClicked()
@@ -257,7 +250,7 @@ export const Controller = () => {
                 setMenuSelected('account')
               }}
             />
-            <IconButton 
+            <ControllerButton 
               Icon={RiSettings3Line} controllerFocused={controllerFocused}
               onClick={() => {
                 controlButtonClicked()
@@ -269,7 +262,7 @@ export const Controller = () => {
           <div className={`${
             location === 'top' || location === 'bottom' ? 'flex flex-row' : 'flex flex-col'
           }`}>
-            <IconButton 
+            <ControllerButton 
               Icon={PiFilesDuotone} controllerFocused={controllerFocused}
               onClick={() => {
                 controlButtonClicked()
@@ -278,7 +271,7 @@ export const Controller = () => {
                 windows.openWindow('file-explorer', osData)
               }}
             />
-            <IconButton 
+            <ControllerButton 
               Icon={IoIosApps} controllerFocused={controllerFocused}
               onClick={() => {
                 controlButtonClicked()
@@ -294,7 +287,7 @@ export const Controller = () => {
       <div
         className={
           `z-4000 transition-all duration-300 fixed border hover:bg-gray-100/60 dark:hover:bg-gray-500/60 backdrop-blur-md flex justify-center items-center cursor-pointer ${controllerFocused ? 'border-transparent bg-transparent m-0' : 'border-gray-500/50 bg-gray-200/30 dark:bg-gray-600/40 shadow-md m-[2px]'} ${
-            location === 'top' || location === 'bottom' ?
+            (location === 'top' || location === 'bottom') ?
             // top or bottom
               `${controllerFocused ? 'w-[52px]' : 'w-[44px]'}` : 
             // left or right
@@ -348,129 +341,5 @@ export const Controller = () => {
         }}
       />
     </>
-  )
-}
-
-type IconButtonProps = {
-  Icon: IconType
-  controllerFocused: boolean
-  onClick: () => void
-  size?: number
-}
-
-const IconButton: FC<IconButtonProps> = ({
-  Icon,
-  controllerFocused,
-  onClick,
-  size,
-}) => {
-  const iconSize = () => (controllerFocused ? 24 : 12)
-  const iconColor = () => `dark:text-white text-black`
-
-  return (
-    <button className="flex justify-center items-center transition duration-200 h-[52px] w-[52px] cursor-pointer hover:bg-gray-100/60 dark:hover:bg-gray-500/60" onClick={onClick}>
-      <Icon
-        className={`${iconColor()} drop-shadow-[0px_0px_5px_rgba(255,255,255,0.25)]`} size={size ?? iconSize()}
-      />
-    </button>
-  )
-}
-
-type MenuItem = {
-  icon: string
-  title: string
-  menuId: string
-  onClick: () => void
-}
-
-type MenuProps = {
-  direction: BiLocation | null
-  controllerLocation: ControllerOptions['location']
-  menuSelected: string
-  items: MenuItem[]
-  onMouseEnter?: () => void
-  onMouseLeave?: () => void
-}
-
-const Menu: FC<MenuProps> = ({
-  direction,
-  controllerLocation,
-  menuSelected,
-  items,
-  onMouseEnter,
-  onMouseLeave,
-}) => {
-  if (!direction) return null
-
-  let emptyWindows = false
-
-  if (items.length === 0) {
-    if (menuSelected === 'windows') emptyWindows = true
-    else return null
-  }
-
-  return (
-    <div 
-      className={`flex flex-col font-sm dark:text-white text-black py-1.5 pl-1.5 pr-1 fixed z-2000 h-fit max-h-full min-w-[240px] max-w-[480px] bg-gray-400/30 dark:bg-gray-600/30 backdrop-blur-md shadow-md overflow-scroll scrollbar-hide ${
-        controllerLocation === 'top' ? 'top-[52px] rounded-b-2xl' : ''
-      } ${
-        controllerLocation === 'bottom' ? 'safe-bottom-minus-bar rounded-t-2xl' : ''
-      } ${
-        controllerLocation === 'left' ? 'left-[52px] rounded-r-2xl' : ''
-      } ${
-        controllerLocation === 'right' ? 'right-[52px] rounded-l-2xl' : ''
-      } ${
-        (
-          (controllerLocation === 'top' || controllerLocation === 'bottom') &&
-          direction === 'top-left'
-        ) ? 'left-0' : ''
-      } ${
-        (
-          (controllerLocation === 'top' || controllerLocation === 'bottom') &&
-          direction === 'bottom-right'
-        ) ? 'right-0' : ''
-      } ${
-        (
-          (controllerLocation === 'left' || controllerLocation === 'right') &&
-          direction === 'top-left'
-        ) ? 'top-0' : ''
-      } ${
-        (
-          (controllerLocation === 'left' || controllerLocation === 'right') &&
-          direction === 'bottom-right'
-        ) ? 'safe-bottom' : ''
-      }`}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-    >
-      {
-        emptyWindows ? 
-          <div className="flex justify-center items-center w-full h-8">
-            <p className="font-sm opacity-70">No Windows Open</p>
-          </div> 
-          :
-          items.map((item, index) => {
-            return (
-              <div key={item.menuId}>
-                {
-                  index !== 0 ?
-                    <div className="w-full flex justify-center items-center">
-                      <div className="bg-gray-500/20 dark:bg-gray-500/20 w-[calc(100%-24px)] h-[1px]" />
-                    </div> :
-                    <></>
-                }
-                <button
-                  className={`flex font-sm !text-[0.9em] items-center justify-start w-full py-2 px-4 hover:bg-gray-100/60 dark:hover:bg-gray-500/60 cursor-pointer rounded-xl my-[2px] shadow-none hover:shadow`}
-                  onClick={() => {
-                    item.onClick()
-                  }}
-                >
-                  {item.title}
-                </button>
-              </div>
-            )
-          })
-      }
-    </div>
   )
 }
