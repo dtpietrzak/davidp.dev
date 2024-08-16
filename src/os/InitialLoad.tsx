@@ -2,7 +2,7 @@
 
 import { useEffect } from "react"
 
-export const InitialLoad = () => {
+export const Boot = () => {
   useEffect(() => {
     function getIsIos() {
       return /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream
