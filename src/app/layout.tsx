@@ -12,7 +12,7 @@ import { MetaTags } from "@/app/MetaTags"
 
 import { ToolTipProvider } from "@/components/ToolTip"
 
-import { InitialLoad } from "@/os/InitialLoad"
+import { Boot } from "@/os/InitialLoad"
 import { StorageProvider } from "@/os/storage"
 import { WindowsProvider } from "@/os/windows"
 import { ControllerProvider } from "@/os/controller"
@@ -69,7 +69,7 @@ export default function RootLayout({
       </head>
       <body className={`${bodyFont.className} ${windowGrabFont.variable} ${heroFont.variable} ${headerFont.variable} ${bodyFont.variable} ${tinyFont.variable}`}>
         <StorageProvider>
-          <InitialLoad />
+          <Boot />
           <ToolTipProvider>
             <WindowsProvider>
               <ControllerProvider>
