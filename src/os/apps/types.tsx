@@ -1,25 +1,29 @@
+import { App } from "@/os/apps/useApps"
+
 export type AppId = 
   | 'file-explorer'
   | 'web-browser'
   | 'text-editor'
   | 'system-information'
 
-export type AppAvail<T extends string> = {
-  index: number
-  appId: T
+export type AppAvail = {
   title: string
   icon: string
+  multiInstance: boolean
+  appId: string
   sync: boolean
+  index: number
+  app: App
 }
-export type AppsAvail<T extends string> = Record<T, AppAvail<T>>
+export type AppsAvail = Record<string, AppAvail>
 
-export type AppRunning<T extends string> = {
+export type AppRunning = {
   menuIndex: number
   windowIndex: number
-  appId: T
+  appId: string
   instanceId: string
   title: string
   appData: Record<string, any> 
 }
 
-export type AppsRunning<T extends string> = Record<string, AppRunning<T>>
+export type AppsRunning = Record<string, AppRunning>

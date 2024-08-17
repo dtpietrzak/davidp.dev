@@ -3,26 +3,9 @@
 import { useState } from "react"
 
 import { ScrollBar } from "@/components/ScrollBar"
-import { App, OpenWindow, renderWindow } from "@/os/apps"
-// import { Application } from "@/os/apps"
+import { App } from "@/os/apps"
 
-// export const App: Application = {
-//   title: 'File Explorer',
-//   multiInstance: false,
-//   app: (osData) => <FileExplorer />,
-// }
-
-export const openTextEditor: OpenWindow = ({
-  forApp, forRender,
-}) => {
-  return renderWindow({
-    title: 'Text Editor',
-    windowId: 'text-editor',
-    app: <TextEditor {...forApp} />,
-  }, forRender)
-}
-
-const TextEditor: App = (osData) => {
+export const TextEditor: App = (osData) => {
   const [text, setText] = useState<string>("")
 
   return (

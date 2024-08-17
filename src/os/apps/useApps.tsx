@@ -2,19 +2,18 @@
 
 import { atom } from "jotai"
 import { useImmerAtom } from "jotai-immer"
-import { mergeDeep } from "immutable"
 import { AppAvail, AppId, AppRunning, AppsAvail, AppsRunning } from "@/os/apps/types"
 import { defaultApps } from "@/os/apps/defaults"
 import { FC, useCallback, useMemo } from "react"
-import { openFileExplorer } from "@/apps/FileExplorer/app"
-import { openTextEditor } from "@/apps/TextEditor/app"
 import { Window } from "@/os/apps/Window"
 import { createRoot } from "react-dom/client"
+import { useSystem } from "@/os/system"
 
-const atomAppsAvail = atom(defaultApps satisfies AppsAvail<AppId>)
-const atomAppsRunning = atom({} as AppsRunning<AppId>)
+const atomAppsAvail = atom(defaultApps as AppsAvail)
+const atomAppsRunning = atom({} as AppsRunning)
 
 export const useApps = () => {
+  const system = useSystem()
   /**
    * 
    * Apps Avail - Apps Avail - Apps Avail
@@ -25,8 +24,8 @@ export const useApps = () => {
     return Object.values(getAppsAvail).sort((a, b) => a.index - b.index)
   }, [getAppsAvail])
 
-  const addAppAvail = useCallback((app: AppAvail<AppId>) => {
-    const appIds = Object.keys(getAppsAvail) as AppId[]
+  const addAppAvail = useCallback((app: AppAvail) => {
+    const appIds = Object.keys(getAppsAvail)
     if (app.appId in appIds) {
       throw new Error(`App with id ${app.appId} already exists`)
     }
@@ -35,7 +34,7 @@ export const useApps = () => {
     })
   }, [getAppsAvail, setAppsAvail])
 
-  const reorderAppAvail = useCallback((appId: AppId, indexRequest: number) => {
+  const reorderAppAvail = useCallback((appId: string, indexRequest: number) => {
     for (let i = 0; i < appsAvailMenu.length; i++) {
       const appMoving = appsAvailMenu[i]
       if (appMoving.appId === appId) {
@@ -101,30 +100,72 @@ export const useApps = () => {
     )
   }, [getAppsRunning])
 
-  const openApp = useCallback(<T extends string>(app: AppRunning<T>) => {
-    const appIds = Object.keys(getAppsAvail)
-    if (app.appId in appIds) {
+  const openApp = useCallback((
+    appToRun: Pick<AppRunning, 'appData' | 'appId' | 'instanceId' | 'title'>,
+  ) => {
+    const appsAvailIds = Object.keys(getAppsAvail)
+    console.log("2", appsAvailIds, appToRun.appId)
+    if (appsAvailIds.includes(appToRun.appId)) {
       // app is available to open
 
       // check if app is already running
-      const appRunningIds = Object.keys(getAppsRunning)
-      if (app.appId in appRunningIds) {
-        throw new Error(`App with id ${app.appId} is already running`)
-      }
+      appsRunningWindows.forEach((appAlreadyRunning) => {
+        if (
+          appAlreadyRunning.appId === appToRun.appId &&
+          appAlreadyRunning.instanceId === appToRun.instanceId
+        ) {
+          throw new Error(`App ${appToRun.appId}-${appToRun.instanceId} is already running`)
+        }
+      })
+      // app is not already running, boot it up!
+      const newRunningApps = { ...getAppsRunning }
+      // shift all indexes up one
+      appsRunningWindows.forEach((appAlreadyRunning) => {
+        const _id = `${appAlreadyRunning.appId}-${appAlreadyRunning.instanceId}`
+        newRunningApps[_id].menuIndex++
+        newRunningApps[_id].windowIndex++
+      })
 
+      renderWindow({
+        title: appToRun.title,
+        appId: appToRun.appId,
+        instanceId: appToRun.instanceId,
+        userId: system.system.user.userId,
+        app: getAppsAvail[appToRun.appId as AppId].app,
+      })
+
+      const newApp: AppRunning = {
+        ...appToRun,
+        menuIndex: 0,
+        windowIndex: 0,
+      }
       // open app
       setAppsRunning((draft) => {
-        draft = mergeDeep(draft, app)
+        const _id = `${newApp.appId}-${newApp.instanceId}`
+        draft[_id] = newApp 
       })
     } else {
-      throw new Error(`App with id ${app.appId} is not available`)
+      throw new Error(`App ${appToRun.appId}-${appToRun.instanceId} is not available`)
     }
-  }, [getAppsAvail, getAppsRunning, setAppsRunning])
+  }, [appsRunningWindows, getAppsAvail, getAppsRunning, setAppsRunning, system.system.user.userId])
 
-  const closeApp = useCallback((appId: (keyof typeof getAppsAvail)) => {
-    setAppsAvail((draft) => {
-      delete draft[appId]
-    })
+  const closeApp = useCallback((
+    appId: (keyof typeof getAppsAvail),
+    instanceId: string,
+    userId?: string, // need to add user id
+  ) => {
+    if (typeof window !== 'undefined') {
+      const _id = `${appId}-${instanceId}`
+      const appToClose = document.getElementById(_id)
+      if (appToClose) {
+        appToClose.style.display = 'none'
+        appToClose.remove()
+      }
+
+      setAppsAvail((draft) => {
+        delete draft[`${appId}-${instanceId}`]
+      })
+    }
   }, [setAppsAvail])
   
   return {
@@ -145,21 +186,6 @@ export const useApps = () => {
   }
 }
 
-const openGenericWindow: OpenWindow = (osData) => {
-  return renderWindow({
-    title: 'Generic Window',
-    windowId: 'generic-window',
-    app: <></>,
-  }, osData.forRender)
-}
-
-const apps = {
-  'file-explorer': openFileExplorer,
-  'web-browser': openGenericWindow,
-  'text-editor': openTextEditor,
-  'system-information': openGenericWindow,
-} as const
-
 export type OpenWindowOsDataForApp = {
   userId: string
 }
@@ -175,7 +201,8 @@ export type OpenWindowOsData = {
 
 export type OpenWindowAppData = {
   title: string
-  windowId: string
+  appId: string
+  instanceId: string
 } | null
 
 export type OpenWindow = (
@@ -186,21 +213,24 @@ export type App = FC<OpenWindowOsData['forApp']>
 
 export type RenderWindowProps = {
   title: string
-  windowId: string
-  app: React.ReactNode
+  appId: string
+  instanceId: string
+  userId: string
+  app: App
 }
 
 export const renderWindow = (
-  { title, windowId, app }: RenderWindowProps,
-  forRender: OpenWindowOsData['forRender'],
-): OpenWindowAppData | null => {
-  if (document.getElementById(windowId)) {
-    console.error(`${windowId} already open 1`)
+  { title, appId, instanceId, userId, app }: RenderWindowProps
+) => {
+  const _id = `${appId}-${instanceId}`
+
+  if (document.getElementById(_id)) {
+    console.error(`${_id} already open`)
     return null
   }
 
   const element = document.createElement('div')
-  element.id = windowId
+  element.id = _id
 
   const main = document.getElementById('main')
   if (!main) return null
@@ -210,79 +240,11 @@ export const renderWindow = (
   componentRoot.render(
     <Window
       title={title}
-      windowId={windowId}
-      userId={forRender.userId}
+      appId={appId}
+      instanceId={instanceId}
+      userId={userId}
     >
-      { app }
+      { app({ userId: userId }) }
     </Window>
   )
-
-  return {
-    title: title,
-    windowId: windowId,
-  }
-}
-
-
-
-
-
-export type AppName = keyof typeof apps
-
-export type OsData = {
-  userId: string
-}
-
-const prepOsData = (osData: OsData): OpenWindowOsData => {
-  return {
-    forApp: {
-      userId: osData.userId,
-    },
-    forRender: {
-      userId: osData.userId,
-    },
-  }
-}
-
-export const windowManager: WindowManager = {
-  openWindow: (appName: AppName, osData: OsData) => {
-    const appData = apps[appName](prepOsData(osData))
-    if (!appData) {
-      console.error(`${appName} failed to open`)
-      return
-    } else {
-      const newState = { ...windowManager.state }
-      for (const windowId in newState) {
-        newState[windowId].index += 1
-      }
-      windowManager.state = {
-        ...newState,
-        [appData.windowId]: {
-          title: appData.title,
-          windowId: appData.windowId,
-          index: 0,
-        },
-      }
-      localStorage.setItem(`${osData.userId}-windowState`, JSON.stringify(windowManager.state))
-      return appData
-    }
-  },
-  closeWindow: (userId: string, windowId: string) => {
-    const Window = document.getElementById(windowId)
-    if (Window) {
-      delete windowManager.state[windowId]
-      localStorage.setItem(`${userId}-windowState`, JSON.stringify(windowManager.state))
-      Window.style.display = 'none'
-      Window.remove()
-    } else {
-      console.error(`${windowId} - tried to close but window not found`)
-    }
-  },
-  state: {
-
-  },
-}
-
-if (typeof window !== 'undefined') {
-  window.windowManager = windowManager
 }

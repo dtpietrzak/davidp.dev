@@ -11,7 +11,7 @@ import { RiSettings3Line, RiAccountBoxLine } from "react-icons/ri"
 import { flushSync } from "react-dom"
 
 import { useToolTip } from "@/components/ToolTip"
-import { useApps, windowManager } from "@/os/apps"
+import { useApps } from "@/os/apps"
 import { ControllerButton } from "@/os/controller/Controller/ControllerButton"
 import { Menu, MenuItem } from "@/os/controller/Controller/Menu"
 import { ControllerBiLocation, ControllerOptions } from "@/os/controller/Controller/types"
@@ -149,7 +149,12 @@ export const Controller = () => {
       title: app.title,
       menuId: app.appId,
       onClick: () => {
-        windowManager.openWindow(app.appId, system.user)
+        apps.running.open({
+          appData: {},
+          appId: app.appId,
+          instanceId: '0',
+          title: app.title,
+        })
       },
     })),
     windows: []

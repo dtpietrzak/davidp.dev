@@ -6,7 +6,6 @@ import { mergeDeep } from "immutable"
 import { defaultSystem } from "@/os/system/defaults"
 import { System, SystemSettings, SystemUser } from "@/os/system/types"
 import { useEffect } from "react"
-import { windowManager } from "@/os/apps"
 
 const systemAtom = atom<System>(defaultSystem)
 
@@ -14,10 +13,10 @@ export const useSystem = () => {
   const [get, set] = useImmerAtom(systemAtom)
 
   useEffect(() => {
-    const windowState = localStorage.getItem(`${get.user.userId}-windowState`)
-    Object.values(JSON.parse(windowState ?? "{}")).forEach((_window: any) => {
-      windowManager.openWindow(_window.windowId, get.user)
-    })
+    // const windowState = localStorage.getItem(`${get.user.userId}-windowState`)
+    // Object.values(JSON.parse(windowState ?? "{}")).forEach((_window: any) => {
+    //   windowManager.openWindow(_window.windowId, get.user)
+    // })
   }, [get.user, get.user.userId])
 
   const updateSettings = (partialSettings: Partial<SystemSettings>) => {
