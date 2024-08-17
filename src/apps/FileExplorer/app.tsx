@@ -1,3 +1,5 @@
+"use client"
+
 import { ScrollBar } from "@/components/ScrollBar"
 import { App } from "@/os/apps"
 

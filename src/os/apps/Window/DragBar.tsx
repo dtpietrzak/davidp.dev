@@ -9,7 +9,7 @@ import { useApps } from "@/os/apps/useApps"
 type DragBarProps = {
   title: string
   appId: string
-  instanceId: string
+  instanceId: number
   isDragging: boolean
   onChangeIsDragging: (isDragging: boolean) => void
   mouseSelectedDrag: boolean

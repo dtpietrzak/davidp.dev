@@ -38,7 +38,7 @@ const clampHeight = (height: number) => {
 type WindowProps = {
   title: string
   appId: string
-  instanceId: string
+  instanceId: number
   userId: string
   children: React.ReactNode
 }

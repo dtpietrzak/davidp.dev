@@ -8,6 +8,7 @@ import { FC, useCallback, useMemo } from "react"
 import { Window } from "@/os/apps/Window"
 import { createRoot } from "react-dom/client"
 import { useSystem } from "@/os/system"
+import { openTextEditor } from "@/apps/TextEditor/app"
 
 const atomAppsAvail = atom(defaultApps as AppsAvail)
 const atomAppsRunning = atom({} as AppsRunning)
@@ -42,31 +43,27 @@ export const useApps = () => {
           // exit early, no changes needed
           return true
         } else if (appMoving.index < indexRequest) {
-          const newAppsAvail = { ...getAppsAvail }
-          // set as requested
-          newAppsAvail[appId].index = indexRequest
-          // then go back and shift the in-betweens down
-          // no need to go to the end of the array
-          // just until you hit the requested index
-          for (let j = i + 1; j < indexRequest - 1; j++) {
-            appsAvailMenu[j].index--
-          }
           // set appsAvail to newAppsAvail
           setAppsAvail((draft) => {
-            draft = newAppsAvail
+            // set as requested
+            draft[appId].index = indexRequest
+            // then go back and shift the in-betweens down
+            // no need to go to the end of the array
+            // just until you hit the requested index
+            for (let j = i + 1; j < indexRequest - 1; j++) {
+              draft[appsAvailMenu[j].appId].index--
+            }
           })
           return true
         } else if (appMoving.index > indexRequest) {
-          const newAppsAvail = { ...getAppsAvail }
-          // set as requested
-          newAppsAvail[appId].index = indexRequest
-          // then go back and shift the rest up
-          for (let j = i - 1; j >= 0; j--) {
-            appsAvailMenu[j].index++
-          }
           // set appsAvail to newAppsAvail
           setAppsAvail((draft) => {
-            draft = newAppsAvail
+            // set as requested
+            draft[appId].index = indexRequest
+            // then go back and shift the rest up
+            for (let j = i - 1; j >= 0; j--) {
+              draft[appsAvailMenu[j].appId].index++
+            }
           })
           return true
         }
@@ -75,7 +72,7 @@ export const useApps = () => {
     }
     // we got here, so the app must not exist!
     throw new Error(`App with id ${appId} does not exist`)
-  }, [appsAvailMenu, getAppsAvail, setAppsAvail])
+  }, [appsAvailMenu, setAppsAvail])
 
   const removeAppAvail = useCallback((appId: (keyof typeof getAppsAvail)) => {
     setAppsAvail((draft) => {
@@ -101,57 +98,77 @@ export const useApps = () => {
   }, [getAppsRunning])
 
   const openApp = useCallback((
-    appToRun: Pick<AppRunning, 'appData' | 'appId' | 'instanceId' | 'title'>,
+    appToRun: Pick<AppRunning, 'appData' | 'appId' | 'title'>,
   ) => {
-    const appsAvailIds = Object.keys(getAppsAvail)
-    console.log("2", appsAvailIds, appToRun.appId)
-    if (appsAvailIds.includes(appToRun.appId)) {
+    const appAvail = getAppsAvail[appToRun['appId']]
+    if (appAvail) {
       // app is available to open
+      let instanceId = 0
+
+      // is the app multi-instance?
+      if (appAvail.multiInstance) {
+        const instances: number[] = []
+        appsRunningWindows.forEach((appAlreadyRunning) => {
+          if (appAlreadyRunning.appId === appToRun.appId) {
+            instances.push(appAlreadyRunning.instanceId)
+          }
+        })
+        instances.sort((a, b) => a - b)
+        instanceId = instances[instances.length] + 1
+      }
 
       // check if app is already running
-      appsRunningWindows.forEach((appAlreadyRunning) => {
-        if (
-          appAlreadyRunning.appId === appToRun.appId &&
-          appAlreadyRunning.instanceId === appToRun.instanceId
-        ) {
-          throw new Error(`App ${appToRun.appId}-${appToRun.instanceId} is already running`)
+      const appIsRunning = appsRunningWindows.some((appRunning) => {
+        if (appRunning.appId === appToRun.appId) {
+          if (appRunning.instanceId === instanceId) {
+            console.warn(`App ${appRunning.appId}-${instanceId} is already running`)
+            return true
+          }
         }
       })
+      if (appIsRunning) return
+      
       // app is not already running, boot it up!
-      const newRunningApps = { ...getAppsRunning }
-      // shift all indexes up one
-      appsRunningWindows.forEach((appAlreadyRunning) => {
-        const _id = `${appAlreadyRunning.appId}-${appAlreadyRunning.instanceId}`
-        newRunningApps[_id].menuIndex++
-        newRunningApps[_id].windowIndex++
-      })
 
-      renderWindow({
-        title: appToRun.title,
-        appId: appToRun.appId,
-        instanceId: appToRun.instanceId,
-        userId: system.system.user.userId,
-        app: getAppsAvail[appToRun.appId as AppId].app,
-      })
-
-      const newApp: AppRunning = {
-        ...appToRun,
-        menuIndex: 0,
-        windowIndex: 0,
+      if (appToRun.appId === 'text-editor') {
+        openTextEditor()
+      } else {
+        renderWindow({
+          title: appToRun.title,
+          appId: appToRun.appId,
+          instanceId: instanceId,
+          userId: system.system.user.userId,
+          app: getAppsAvail[appToRun.appId as AppId].app,
+        })
       }
+
       // open app
       setAppsRunning((draft) => {
+        const newApp: AppRunning = {
+          ...appToRun,
+          instanceId: instanceId,
+          menuIndex: 0,
+          windowIndex: 0,
+        }
+
+        // shift all indexes up one
+        appsRunningWindows.forEach((appAlreadyRunning) => {
+          const _id = `${appAlreadyRunning.appId}-${appAlreadyRunning.instanceId}`
+          draft[_id].menuIndex++
+          draft[_id].windowIndex++
+        })
+
         const _id = `${newApp.appId}-${newApp.instanceId}`
         draft[_id] = newApp 
       })
     } else {
-      throw new Error(`App ${appToRun.appId}-${appToRun.instanceId} is not available`)
+      throw new Error(`App ${appToRun.appId} is not available`)
     }
-  }, [appsRunningWindows, getAppsAvail, getAppsRunning, setAppsRunning, system.system.user.userId])
+  }, [appsRunningWindows, getAppsAvail, setAppsRunning, system.system.user.userId])
 
   const closeApp = useCallback((
     appId: (keyof typeof getAppsAvail),
-    instanceId: string,
+    instanceId: number,
     userId?: string, // need to add user id
   ) => {
     if (typeof window !== 'undefined') {
@@ -162,11 +179,12 @@ export const useApps = () => {
         appToClose.remove()
       }
 
-      setAppsAvail((draft) => {
+      setAppsRunning((draft) => {
         delete draft[`${appId}-${instanceId}`]
       })
     }
-  }, [setAppsAvail])
+  }, [setAppsRunning])
+
   
   return {
     avail: {
@@ -214,26 +232,30 @@ export type App = FC<OpenWindowOsData['forApp']>
 export type RenderWindowProps = {
   title: string
   appId: string
-  instanceId: string
+  instanceId: number
   userId: string
   app: App
 }
 
-export const renderWindow = (
-  { title, appId, instanceId, userId, app }: RenderWindowProps
-) => {
+export const renderWindow = ({ 
+  title, 
+  appId,
+  instanceId,
+  userId,
+  app,
+}: RenderWindowProps): void => {
   const _id = `${appId}-${instanceId}`
 
   if (document.getElementById(_id)) {
     console.error(`${_id} already open`)
-    return null
+    return
   }
 
   const element = document.createElement('div')
   element.id = _id
 
   const main = document.getElementById('main')
-  if (!main) return null
+  if (!main) return
   main.appendChild(element)
 
   const componentRoot = createRoot(element)

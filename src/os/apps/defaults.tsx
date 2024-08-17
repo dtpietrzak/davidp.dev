@@ -1,8 +1,8 @@
 import { FileExplorer } from "@/apps/FileExplorer/app"
 import { TextEditor } from "@/apps/TextEditor/app"
-import { AppId, AppsAvail } from "@/os/apps/types"
+import { AppsAvail } from "@/os/apps/types"
 
-export const defaultApps: AppsAvail<AppId> = {
+export const defaultApps: AppsAvail = {
   "file-explorer": {
     title: "File Explorer",
     icon: "",

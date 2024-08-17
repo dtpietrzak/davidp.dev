@@ -21,7 +21,7 @@ export type AppRunning = {
   menuIndex: number
   windowIndex: number
   appId: string
-  instanceId: string
+  instanceId: number
   title: string
   appData: Record<string, any> 
 }
