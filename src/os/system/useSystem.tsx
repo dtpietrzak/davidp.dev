@@ -5,11 +5,20 @@ import { useImmerAtom } from "jotai-immer"
 import { mergeDeep } from "immutable"
 import { defaultSystem } from "@/os/system/defaults"
 import { System, SystemSettings, SystemUser } from "@/os/system/types"
+import { useEffect } from "react"
+import { windowManager } from "@/os/windows"
 
 const systemAtom = atom<System>(defaultSystem)
 
 export const useSystem = () => {
   const [get, set] = useImmerAtom(systemAtom)
+
+  useEffect(() => {
+    const windowState = localStorage.getItem(`${get.user.userId}-windowState`)
+    Object.values(JSON.parse(windowState ?? "{}")).forEach((_window: any) => {
+      windowManager.openWindow(_window.windowId, get.user)
+    })
+  }, [get.user, get.user.userId])
 
   const updateSettings = (partialSettings: Partial<SystemSettings>) => {
     set((draft) => {
@@ -18,7 +27,7 @@ export const useSystem = () => {
   }
 
   const updateUser = (partialUser: Partial<SystemUser>) => {
-    if (partialUser.id) {
+    if (partialUser.userId) {
       throw new Error("Cannot update user id")
     }
     set((draft) => {
@@ -26,16 +35,17 @@ export const useSystem = () => {
     })
   }
 
-  const login = () => {
-    const user = defaultSystem.user
+  // temporary login function
+  const login = (newUser: SystemUser) => {
     set((draft) => {
-      draft.user = user
+      draft.user = newUser
     })
   }
 
   const logout = () => {
     set((draft) => {
-      draft = defaultSystem
+      draft.user = defaultSystem.user
+      draft.settings = defaultSystem.settings
     })
   }
   

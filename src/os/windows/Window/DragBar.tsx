@@ -3,6 +3,9 @@ import { IoCloseCircle } from "react-icons/io5"
 import { RiDragMoveFill } from "react-icons/ri"
 import { useClickAway } from "react-use"
 
+import { windowManager } from "@/os/windows"
+import { useSystem } from "@/os/system"
+
 type DragBarProps = {
   title: string
   windowId: string
@@ -30,6 +33,8 @@ export const DragBar: FC<DragBarProps> = ({
   onChangeTouchSelectedDrag,
   onCaptureInitialCoords,
 }) => {
+  const { system } = useSystem()
+
   const dragBarClickawayRef = useRef(null)
   useClickAway(dragBarClickawayRef, () => {
     onChangeTouchSelectedDrag(false)
@@ -99,11 +104,7 @@ export const DragBar: FC<DragBarProps> = ({
             </div>
             :
             <button onClick={() => {
-              const Window = document.getElementById(windowId)
-              if (Window) {
-                Window.style.display = 'none'
-                Window.remove()
-              }
+              windowManager.closeWindow(system.user.userId, windowId)
             }}>
               <IoCloseCircle size={18} className="opacity-80 hover:opacity-100" />
             </button>

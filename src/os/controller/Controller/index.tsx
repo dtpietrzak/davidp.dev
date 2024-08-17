@@ -11,19 +11,19 @@ import { RiSettings3Line, RiAccountBoxLine } from "react-icons/ri"
 import { flushSync } from "react-dom"
 
 import { useToolTip } from "@/components/ToolTip"
-import { useWindows } from "@/os/windows"
+import { windowManager } from "@/os/windows"
 import { useApps } from "@/os/apps"
 import { ControllerButton } from "@/os/controller/Controller/ControllerButton"
 import { Menu, MenuItem } from "@/os/controller/Controller/Menu"
 import { ControllerBiLocation, ControllerOptions } from "@/os/controller/Controller/types"
+import { useSystem } from "@/os/system"
 
 let timeInControllerHitbox = 0
-
-
 
 const locationsArray: ControllerOptions['location'][] = ['right', 'left', 'top', 'bottom']
 
 export const Controller = () => {
+  const { system, login, logout } = useSystem()
   const { appsArr } = useApps()
   const { x, y } = useMousePosition()
   const { openToolTip, closeToolTip } = useToolTip()
@@ -44,12 +44,6 @@ export const Controller = () => {
   const [menuSelected, setMenuSelected] = 
     useState<keyof typeof menuItems>('none')
 
-  const windows = useWindows()
-
-  const [osData, setOsData] = useState({
-    userId: 'guest',
-  })
-
   const clickAwayRef = useRef(null)
   useClickAway(clickAwayRef, () => {
     if (controllerFocused && (
@@ -64,6 +58,21 @@ export const Controller = () => {
 
   const menuItems: Record<string, MenuItem[]> = {
     none: [],
+    account: [{
+      icon: '',
+      title: `Log Out - ${system.user.userId}`,
+      menuId: 'log-out',
+      onClick: () => {
+        logout()
+      },
+    },{
+      icon: '',
+      title: 'Profile',
+      menuId: 'profile',
+      onClick: () => {
+        login({ userId: 'DavidP', name: 'David' })
+      },
+    }],
     settings: [{
       icon: '',
       title: 'Light / Dark Theme',
@@ -100,23 +109,12 @@ export const Controller = () => {
         setLocation(locationsArray[temp])
       },
     }],
-    account: [{
-      icon: '',
-      title: 'Log Out',
-      menuId: 'log-out',
-      onClick: () => {},
-    },{
-      icon: '',
-      title: 'Profile',
-      menuId: 'profile',
-      onClick: () => {},
-    }],
     apps: appsArr.map((app) => ({
       icon: '',
       title: app.title,
       menuId: app.appId,
       onClick: () => {
-        windows.openWindow(app.appId, osData)
+        windowManager.openWindow(app.appId, system.user)
       },
     })),
     windows: []
@@ -268,7 +266,7 @@ export const Controller = () => {
                 controlButtonClicked()
                 setMenuDirection(null)
                 setMenuSelected('none')
-                windows.openWindow('file-explorer', osData)
+                windowManager.openWindow('file-explorer', system.user)
               }}
             />
             <ControllerButton 

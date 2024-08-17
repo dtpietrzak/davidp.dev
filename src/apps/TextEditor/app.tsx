@@ -28,7 +28,7 @@ const TextEditor: App = (osData) => {
   return (
     <ScrollBar>
       <textarea
-        className={'w-full h-full'}
+        className={'w-full h-full resize-none bg-gray-500/10'}
         value={text}
         onChange={(e) => {
           setText(e.currentTarget.value)

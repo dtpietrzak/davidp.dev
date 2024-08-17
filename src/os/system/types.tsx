@@ -8,7 +8,7 @@ export type SystemSettings = {
 }
 
 export type SystemUser = {
-  id: string
+  userId: string
   name: string
   image?: string
 }

@@ -12,9 +12,8 @@ import { MetaTags } from "@/app/MetaTags"
 
 import { ToolTipProvider } from "@/components/ToolTip"
 
-import { Boot } from "@/os/InitialLoad"
+import { Boot } from "@/os/Boot"
 import { StorageProvider } from "@/os/storage"
-import { WindowsProvider } from "@/os/windows"
 import { ControllerProvider } from "@/os/controller"
 
 const windowGrabFont = WindowGrabFont({
@@ -71,15 +70,13 @@ export default function RootLayout({
         <StorageProvider>
           <Boot />
           <ToolTipProvider>
-            <WindowsProvider>
-              <ControllerProvider>
-                <div id="screen" className="h-full w-full bg-repeat bg-pattern-light dark:bg-pattern-dark">
-                  <div className="flex safe-h-full flex-col items-center justify-between p-24">
-                    {children}
-                  </div>
+            <ControllerProvider>
+              <div id="screen" className="h-full w-full bg-repeat bg-pattern-light dark:bg-pattern-dark">
+                <div className="flex safe-h-full flex-col items-center justify-between p-24">
+                  {children}
                 </div>
-              </ControllerProvider>
-            </WindowsProvider>
+              </div>
+            </ControllerProvider>
           </ToolTipProvider>
         </StorageProvider>
       </body>

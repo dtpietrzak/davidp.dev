@@ -12,7 +12,7 @@ const defaultUserSettings: SystemSettings = {
 }
 
 const defaultUser: SystemUser = {
-  id: "guest",
+  userId: "guest",
   name: "Guest",
   image: undefined,
 }
