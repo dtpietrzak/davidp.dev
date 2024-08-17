@@ -8,7 +8,7 @@ export const MetaTags = () => {
       {/* PWA */}
       <meta
         name='viewport'
-        content='minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, user-scalable=no, viewport-fit=cover'
+        content='user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, shrink-to-fit=no, viewport-fit=cover'
       />
       <meta name="application-name" content="davidp.dev" />
       <meta name="apple-mobile-web-app-capable" content="yes" />

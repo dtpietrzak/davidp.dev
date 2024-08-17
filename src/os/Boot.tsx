@@ -41,6 +41,13 @@ export const Boot = () => {
         document.body.style.setProperty('background', '#FFF')
       }
     }
+
+    document.addEventListener('touchmove', (e: TouchEvent) => {
+      // @ts-ignore
+      if (e?.scale !== 1) {
+        e?.preventDefault()
+      }
+    }, { passive: false })
   }, [])
 
   return null

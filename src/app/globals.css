@@ -7,13 +7,16 @@
   --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
 
   --home-indicator-height: 0px;
-}
 
-body {
+  touch-action: pan-x pan-y;
   background: #000;
   height: 100%;
   height: -webkit-fill-available;
   overflow: hidden;
+}
+
+body {
+  
 }
 
 @supports (viewport-fit: cover) {
@@ -40,6 +43,16 @@ body {
   }
   .safe-bottom-minus-bar {
     bottom: calc(var(--safe-area-inset-bottom) + 52px + var(--home-indicator-height));
+  }
+}
+
+@media screen and (max-width: 767px) {
+  input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  input[type="number"],
+  input[type="tel"] {
+    font-size: 16px !important;
   }
 }
 
