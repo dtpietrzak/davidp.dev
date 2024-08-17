@@ -36,14 +36,14 @@ export const Menu: FC<MenuProps> = ({
 
   return (
     <div 
-      className={`flex flex-col border border-gray-500/50 font-sm dark:text-white text-black py-1.5 pl-1.5 pr-1 fixed z-2000 h-fit max-h-full min-w-[240px] max-w-[480px] bg-gray-400/30 dark:bg-gray-600/30 backdrop-blur-md shadow-md overflow-scroll scrollbar-hide ${
-        controllerLocation === 'top' ? 'top-[52px] rounded-b-2xl' : ''
+      className={`flex flex-col border-gray-500/50 font-sm dark:text-white text-black py-1.5 pl-1.5 pr-1 fixed z-2000 h-fit max-h-full min-w-[240px] max-w-[480px] bg-gray-400/30 dark:bg-gray-600/30 backdrop-blur-md shadow-md overflow-scroll scrollbar-hide ${
+        controllerLocation === 'top' ? 'top-[52px] rounded-b-2xl border-b border-l border-r' : ''
       } ${
-        controllerLocation === 'bottom' ? 'safe-bottom-minus-bar rounded-t-2xl' : ''
+        controllerLocation === 'bottom' ? 'safe-bottom-minus-bar rounded-t-2xl border-t border-l border-r' : ''
       } ${
-        controllerLocation === 'left' ? 'left-[52px] rounded-r-2xl' : ''
+        controllerLocation === 'left' ? 'left-[52px] rounded-r-2xl border-t border-b border-r' : ''
       } ${
-        controllerLocation === 'right' ? 'right-[52px] rounded-l-2xl' : ''
+        controllerLocation === 'right' ? 'right-[52px] rounded-l-2xl border-t border-b border-l' : ''
       } ${
         (
           (controllerLocation === 'top' || controllerLocation === 'bottom') &&

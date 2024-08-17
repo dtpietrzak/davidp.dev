@@ -5,8 +5,8 @@ import { useClickAway, useWindowSize } from 'react-use'
 import { useMousePosition } from "@/hooks/useMousePosition"
 
 import { BiWindows, BiDotsVertical } from "react-icons/bi"
+import { MdMenuOpen } from "react-icons/md"
 import { IoIosApps } from "react-icons/io"
-import { PiFilesDuotone } from "react-icons/pi"
 import { RiSettings3Line, RiAccountBoxLine } from "react-icons/ri"
 import { flushSync } from "react-dom"
 
@@ -58,6 +58,42 @@ export const Controller = () => {
 
   const menuItems: Record<string, MenuItem[]> = {
     none: [],
+    focusedApp: [{
+      icon: '',
+      title: 'New',
+      menuId: 'new',
+      onClick: () => {
+        alert('Not implemented')
+      },
+    }, {
+      icon: '',
+      title: 'Open',
+      menuId: 'open',
+      onClick: () => {
+        alert('Not implemented')
+      },
+    }, {
+      icon: '',
+      title: 'Save',
+      menuId: 'save',
+      onClick: () => {
+        alert('Not implemented')
+      },
+    },{
+      icon: '',
+      title: 'Save as...',
+      menuId: 'saveAs',
+      onClick: () => {
+        alert('Not implemented')
+      },
+    }, {
+      icon: '',
+      title: 'Close',
+      menuId: 'close',
+      onClick: () => {
+        alert('Not implemented')
+      },
+    }],
     account: [{
       icon: '',
       title: `Log Out - ${system.user.userId}`,
@@ -261,12 +297,14 @@ export const Controller = () => {
             location === 'top' || location === 'bottom' ? 'flex flex-row' : 'flex flex-col'
           }`}>
             <ControllerButton 
-              Icon={PiFilesDuotone} controllerFocused={controllerFocused}
+              Icon={MdMenuOpen} controllerFocused={controllerFocused}
               onClick={() => {
                 controlButtonClicked()
-                setMenuDirection(null)
-                setMenuSelected('none')
-                windowManager.openWindow('file-explorer', system.user)
+                setMenuDirection('bottom-right')
+                // this will be the app specific menu
+                // when an app gets focused, it's options will be added to menuItems.focusedApp
+                // bottom should always be "Close"
+                setMenuSelected('focusedApp')
               }}
             />
             <ControllerButton 
