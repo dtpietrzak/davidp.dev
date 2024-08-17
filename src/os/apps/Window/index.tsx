@@ -4,9 +4,9 @@ import { useEffect, useState, MouseEvent as ReactMouseEvent, useCallback, FC, us
 
 import { useClickAway } from "react-use"
 
-import { DragBar } from "@/os/windows/Window/DragBar"
-import { ResizeDirections } from "@/os/windows/Window/types"
-import { ResizeButton } from "@/os/windows/Window/ResizeButton"
+import { DragBar } from "@/os/apps/Window/DragBar"
+import { ResizeDirections } from "@/os/apps/Window/types"
+import { ResizeButton } from "@/os/apps/Window/ResizeButton"
 
 // there is a bug in the dragging on mobile code, that caused the touchSelectedDrag to flash false/true/false at the end of a legitimate drag
 

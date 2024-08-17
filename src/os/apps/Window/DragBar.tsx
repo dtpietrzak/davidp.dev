@@ -3,7 +3,7 @@ import { IoCloseCircle } from "react-icons/io5"
 import { RiDragMoveFill } from "react-icons/ri"
 import { useClickAway } from "react-use"
 
-import { windowManager } from "@/os/windows"
+import { windowManager } from "@/os/apps"
 import { useSystem } from "@/os/system"
 
 type DragBarProps = {

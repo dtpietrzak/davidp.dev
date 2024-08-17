@@ -11,8 +11,7 @@ import { RiSettings3Line, RiAccountBoxLine } from "react-icons/ri"
 import { flushSync } from "react-dom"
 
 import { useToolTip } from "@/components/ToolTip"
-import { windowManager } from "@/os/windows"
-import { useApps } from "@/os/apps"
+import { useApps, windowManager } from "@/os/apps"
 import { ControllerButton } from "@/os/controller/Controller/ControllerButton"
 import { Menu, MenuItem } from "@/os/controller/Controller/Menu"
 import { ControllerBiLocation, ControllerOptions } from "@/os/controller/Controller/types"
@@ -24,7 +23,7 @@ const locationsArray: ControllerOptions['location'][] = ['right', 'left', 'top',
 
 export const Controller = () => {
   const { system, login, logout } = useSystem()
-  const { appsArr } = useApps()
+  const apps = useApps()
   const { x, y } = useMousePosition()
   const { openToolTip, closeToolTip } = useToolTip()
   const { width, height } = useWindowSize()
@@ -145,7 +144,7 @@ export const Controller = () => {
         setLocation(locationsArray[temp])
       },
     }],
-    apps: appsArr.map((app) => ({
+    apps: apps.avail.menu.map((app) => ({
       icon: '',
       title: app.title,
       menuId: app.appId,

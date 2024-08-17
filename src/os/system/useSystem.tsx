@@ -6,7 +6,7 @@ import { mergeDeep } from "immutable"
 import { defaultSystem } from "@/os/system/defaults"
 import { System, SystemSettings, SystemUser } from "@/os/system/types"
 import { useEffect } from "react"
-import { windowManager } from "@/os/windows"
+import { windowManager } from "@/os/apps"
 
 const systemAtom = atom<System>(defaultSystem)
 

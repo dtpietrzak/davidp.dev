@@ -1,5 +1,5 @@
 import { ScrollBar } from "@/components/ScrollBar"
-import { App, OpenWindow, renderWindow } from "@/os/windows"
+import { App, OpenWindow, renderWindow } from "@/os/apps"
 // import { Application } from "@/os/apps"
 
 // export const App: Application = {

@@ -1,11 +1,6 @@
-import { Apps } from "@/os/apps/types"
+import { AppId, AppsAvail } from "@/os/apps/types"
 
-export const defaultApps: Apps<
-  | 'file-explorer'
-  | 'web-browser'
-  | 'text-editor'
-  | 'system-information'
-> = {
+export const defaultApps: AppsAvail<AppId> = {
   "file-explorer": {
     appId: "file-explorer",
     title: "File Explorer",

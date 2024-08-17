@@ -1,3 +1,3 @@
-import { useApps } from "@/os/apps/useApps"
+import { useApps, windowManager, renderWindow, OpenWindow, App } from "@/os/apps/useApps"
 
-export { useApps }
+export { useApps, windowManager, renderWindow, type OpenWindow, type App }
