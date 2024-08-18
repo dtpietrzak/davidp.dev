@@ -150,10 +150,9 @@ export const Controller = () => {
       menuId: app.appId,
       onClick: () => {
         apps.running.open({
-          appData: {},
           appId: app.appId,
-          instanceId: '0',
           title: app.title,
+          multiInstance: app.multiInstance,
         })
       },
     })),
