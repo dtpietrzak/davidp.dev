@@ -13,6 +13,7 @@
     "immer": "^10.1.1",
     "immutable": "^4.3.7",
     "jotai": "^2.9.3",
+    "jotai-effect": "^1.0.0",
     "jotai-immer": "^0.4.1",
     "next": "14.2.5",
     "next-pwa": "^5.6.0",

@@ -1,3 +1,5 @@
-import { useApps, renderWindow, OpenWindow, App } from "@/os/apps/useApps"
+import { useApps } from "@/os/apps/useApps"
+import { Application, AppComponent } from '@/os/apps/types'
+import { Loader } from "@/os/apps/Window/Loader"
 
-export { useApps, renderWindow, type OpenWindow, type App }
+export { useApps, type Application, type AppComponent, Loader }

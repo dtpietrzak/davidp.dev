@@ -37,22 +37,18 @@ const clampHeight = (height: number) => {
 
 type WindowProps = {
   title: string
-  appId: string
-  instanceId: number
-  userId: string
+  uaiid: string
   children: React.ReactNode
 }
 
 export const Window: FC<WindowProps> = ({
   title,
+  uaiid,
   children, 
-  appId,
-  instanceId, 
-  userId,
 }) => {
   const id = useCallback((_id: string) => {
-    return `window-${userId}-${appId}-${instanceId}-${_id}`
-  }, [appId, instanceId, userId])
+    return `window-${uaiid}-${_id}`
+  }, [uaiid])
 
   const [_x, setX] = useState(localStorage.getItem(id('x')) ? parseInt(localStorage.getItem(id('x'))!) : 7)
   const _setX = (x: number) => setX(clampX(x, window?.innerWidth ?? 0))
@@ -220,8 +216,7 @@ export const Window: FC<WindowProps> = ({
     >
       <DragBar 
         title={title}
-        appId={appId}
-        instanceId={instanceId}
+        uaiid={uaiid}
         isDragging={isDragging}
         onChangeIsDragging={(value) => setIsDragging(value)}
         mouseSelectedDrag={mouseSelectedDrag}

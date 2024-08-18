@@ -1,41 +1,19 @@
 "use client"
 
-import { ScrollBar } from "@/components/ScrollBar"
-import { App } from "@/os/apps"
+import dynamic from "next/dynamic"
+import { Loader, type Application } from "@/os/apps"
 
-export const FileExplorer: App = (osData) => {
-  return (
-    <ScrollBar>
-      <h1 className="font-5xl mb-2">
-        This is a file explorer. 5xl
-      </h1>
-      <h1 className="font-4xl mb-2">
-        This is a file explorer. 4xl
-      </h1>
-      <h1 className="font-3xl mb-2">
-        This is a file explorer. 3xl
-      </h1>
-      <h1 className="font-2xl mb-2">
-        This is a file explorer. 2xl
-      </h1>
-      <h1 className="font-xl mb-2">
-        This is a file explorer. xl
-      </h1>
-      <h2 className="font-lg mb-2">
-        It is draggable and resizable. lg
-      </h2>
-      <p className="font-md mb-2">
-        This is a file explorer. It is draggable and resizable. It is also closable. It is also draggable and resizable on mobile. It is also closable on mobile. md
-      </p>
-      <p className="font-sm mb-2">
-        It is also closable. It is also draggable and resizable on mobile. It is also closable on mobile. sm
-      </p>
-      <p className="font-xs mb-2">
-        It is also closable. It is also draggable and resizable on mobile. It is also closable on mobile. This is a file explorer. It is draggable and resizable. It is also closable. It is also draggable and resizable on mobile. It is also closable on mobile. xs
-      </p>
-      <p className="font-xxs mb-2">
-        It is also closable. It is also draggable and resizable on mobile. It is also closable on mobile. This is a file explorer. It is draggable and resizable. It is also closable. It is also draggable and resizable on mobile. It is also closable on mobile. xxs
-      </p>
-    </ScrollBar>
-  )
+const FileExplorer = dynamic(() => (
+  import('./FileExplorer').then((mod) => mod.FileExplorer)
+), {
+  loading: () => <Loader />,
+  ssr: false,
+})
+
+export const fileExplorer: Application = {
+  title: "File Explorer",
+  icon: "",
+  multiInstance: false,
+  appId: "file-explorer",
+  app: (systemData) => <FileExplorer {...systemData} />,
 }

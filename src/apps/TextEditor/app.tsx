@@ -1,21 +1,19 @@
 "use client"
 
 import { useState } from "react"
+import { Application } from "@/os/apps"
 
 import { ScrollBar } from "@/components/ScrollBar"
-import { App, renderWindow } from "@/os/apps"
 
-export const openTextEditor = () => {
-  return renderWindow({
-    title: 'Text Editor',
-    appId: 'text-editor',
-    instanceId: 0,
-    userId: 'guest',
-    app: (props) => <TextEditor {...props} />,
-  })
+export const textEditor: Application = {
+  title: "Text Editor",
+  icon: "",
+  multiInstance: false,
+  appId: "text-editor",
+  app: (systemData) => <TextEditor />,
 }
 
-export const TextEditor: App = (osData) => {
+const TextEditor = () => {
   const [text, setText] = useState<string>("")
 
   return (

@@ -8,8 +8,7 @@ import { useApps } from "@/os/apps/useApps"
 
 type DragBarProps = {
   title: string
-  appId: string
-  instanceId: number
+  uaiid: string
   isDragging: boolean
   onChangeIsDragging: (isDragging: boolean) => void
   mouseSelectedDrag: boolean
@@ -25,8 +24,7 @@ type DragBarProps = {
 
 export const DragBar: FC<DragBarProps> = ({
   title,
-  appId,
-  instanceId,
+  uaiid,
   isDragging,
   onChangeIsDragging,
   mouseSelectedDrag,
@@ -107,7 +105,7 @@ export const DragBar: FC<DragBarProps> = ({
             </div>
             :
             <button onClick={() => {
-              apps.running.close(appId, instanceId)
+              apps.running.close(uaiid)
             }}>
               <IoCloseCircle size={18} className="opacity-80 hover:opacity-100" />
             </button>
