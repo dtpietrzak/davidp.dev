@@ -5,8 +5,10 @@ import { useEffect, useState, MouseEvent as ReactMouseEvent, useCallback, FC, us
 import { useClickAway } from "react-use"
 
 import { DragBar } from "@/os/apps/Window/DragBar"
-import { ResizeDirections } from "@/os/apps/Window/types"
 import { ResizeButton } from "@/os/apps/Window/ResizeButton"
+import { ScrollBarBox } from "@/os/apps/Window/ScrollBarBox"
+
+import { type ResizeDirections } from "@/os/apps/Window/types"
 
 // there is a bug in the dragging on mobile code, that caused the touchSelectedDrag to flash false/true/false at the end of a legitimate drag
 
@@ -257,8 +259,10 @@ export const Window: FC<WindowProps> = ({
         onChangeTouchSelectedResize={(value) => setTouchSelectedResize(value)}
         onCaptureInitialCoords={(value) => captureInitialCoords(value)}
       />
-      <div className="py-1 px-2 w-full h-[calc(100%-18px)] overflow-hidden">
-        {children}
+      <div className="w-full h-[calc(100%-18px)] overflow-hidden">
+        <ScrollBarBox>
+          {children}
+        </ScrollBarBox>
       </div>
     </div>
   )

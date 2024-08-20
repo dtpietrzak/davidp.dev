@@ -1,12 +1,11 @@
 "use client"
 
-import { ScrollBar } from "@/components/ScrollBar"
 import { AppComponent } from "@/os/apps"
 import { useSystem } from "@/os/system"
 
 export const FileExplorer: AppComponent = () => {
   return (
-    <ScrollBar>
+    <div>
       <h1 className="font-5xl mb-2">
         This is a file explorer. 5xl
       </h1>
@@ -37,6 +36,6 @@ export const FileExplorer: AppComponent = () => {
       <p className="font-xxs mb-2">
         It is also closable. It is also draggable and resizable on mobile. It is also closable on mobile. This is a file explorer. It is draggable and resizable. It is also closable. It is also draggable and resizable on mobile. It is also closable on mobile. xxs
       </p>
-    </ScrollBar>
+    </div>
   )
 }

@@ -1,12 +1,11 @@
 import { FC } from 'react'
-import { CustomScroll } from 'react-custom-scroll'
 
-type ScrollBarProps = {
+type ScrollBarBoxProps = {
   children: React.ReactNode
   className?: string
 }
 
-export const ScrollBar: FC<ScrollBarProps> = ({ 
+export const ScrollBarBox: FC<ScrollBarBoxProps> = ({ 
   children,
   className,
 }) => {
