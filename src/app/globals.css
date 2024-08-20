@@ -65,7 +65,9 @@ body {
 .scrollbar-hide {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
+  overflow-y: scroll;
 }
+
 
 .font-window-grab {
   @apply text-sm;

@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Scrollbar } from 'react-scrollbars-custom'
+import { CustomScroll } from 'react-custom-scroll'
 
 type ScrollBarProps = {
   children: React.ReactNode
@@ -11,27 +11,10 @@ export const ScrollBar: FC<ScrollBarProps> = ({
   className,
 }) => {
   return (
-    <Scrollbar
-      contentProps={{
-        className: `w-full h-full ${className}`,
-      }}
-      trackYProps={{
-        renderer: (props) => {
-          const { elementRef, ...restProps } = props
-          return (
-            <div 
-              {...restProps} 
-              ref={elementRef} 
-              onTouchStart={(e) => {
-                restProps?.onTouchStart?.(e)
-              }}
-              className={`${restProps.className} trackY !w-1.5`} 
-            />
-          )
-        }
-      }}
+    <div
+      className={`w-full h-full scrollbar-hide overflow-scroll ${className} bg-red-500`}
     >
       {children}
-    </Scrollbar>
+    </div>
   )
 }

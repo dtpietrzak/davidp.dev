@@ -49,7 +49,7 @@ export const useSystem = () => {
   }
   
   return {
-    system: get,
+    data: get,
     updateSettings: updateSettings,
     updateUser: updateUser,
     login: login,

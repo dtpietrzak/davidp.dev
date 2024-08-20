@@ -17,7 +17,7 @@ export type RenderableApp = {
 }
 export type RenderApp = (
   appToRender: RenderableApp, systemData: SystemDataForApp,
-) => Root | null
+) => React.ReactNode
 
 export type Application = {
   title: string
@@ -41,7 +41,6 @@ export type AppRunning = {
   uaiid: string
   title: string
   appData: Record<string, any>
-  appRoot: Root
 }
 
 export type AppsRunning = Record<string, AppRunning>

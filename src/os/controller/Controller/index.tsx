@@ -10,7 +10,6 @@ import { IoIosApps } from "react-icons/io"
 import { RiSettings3Line, RiAccountBoxLine } from "react-icons/ri"
 import { flushSync } from "react-dom"
 
-import { useToolTip } from "@/components/ToolTip"
 import { useApps } from "@/os/apps"
 import { ControllerButton } from "@/os/controller/Controller/ControllerButton"
 import { Menu, MenuItem } from "@/os/controller/Controller/Menu"
@@ -22,10 +21,9 @@ let timeInControllerHitbox = 0
 const locationsArray: ControllerOptions['location'][] = ['right', 'left', 'top', 'bottom']
 
 export const Controller = () => {
-  const { system, login, logout } = useSystem()
+  const system = useSystem()
   const apps = useApps()
   const { x, y } = useMousePosition()
-  const { openToolTip, closeToolTip } = useToolTip()
   const { width, height } = useWindowSize()
   
   const [mouseInControlHandle, setMouseInControlHandle] = useState(false)
@@ -95,17 +93,17 @@ export const Controller = () => {
     }],
     account: [{
       icon: '',
-      title: `Log Out - ${system.user.userId}`,
+      title: `Log Out - ${system.data.user.userId}`,
       menuId: 'log-out',
       onClick: () => {
-        logout()
+        system.logout()
       },
     },{
       icon: '',
       title: 'Profile',
       menuId: 'profile',
       onClick: () => {
-        login({ userId: 'DavidP', name: 'David' })
+        system.login({ userId: 'DavidP', name: 'David' })
       },
     }],
     settings: [{

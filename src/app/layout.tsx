@@ -14,6 +14,7 @@ import { ToolTipProvider } from "@/components/ToolTip"
 
 import { Boot } from "@/os/Boot"
 import { ControllerProvider } from "@/os/controller"
+import { Provider as JotaiProvider } from "jotai"
 
 const windowGrabFont = WindowGrabFont({
   subsets: ["latin"],
@@ -66,16 +67,18 @@ export default function RootLayout({
         <MetaTags />
       </head>
       <body className={`${bodyFont.className} ${windowGrabFont.variable} ${heroFont.variable} ${headerFont.variable} ${bodyFont.variable} ${tinyFont.variable}`}>
-        <Boot />
-        <ToolTipProvider>
-          <ControllerProvider>
-            <div id="screen" className="h-full w-full bg-repeat bg-pattern-light dark:bg-pattern-dark">
-              <div className="flex safe-h-full flex-col items-center justify-between p-24">
-                {children}
+        <JotaiProvider>
+          <Boot />
+          <ToolTipProvider>
+            <ControllerProvider>
+              <div id="screen" className="h-full w-full bg-repeat bg-pattern-light dark:bg-pattern-dark">
+                <div className="flex safe-h-full flex-col items-center justify-between p-24">
+                  {children}
+                </div>
               </div>
-            </div>
-          </ControllerProvider>
-        </ToolTipProvider>
+            </ControllerProvider>
+          </ToolTipProvider>
+        </JotaiProvider>
       </body>
     </html>
   )

@@ -1,17 +1,14 @@
 "use client"
 
-import { useCallback, useEffect, useMemo } from "react"
-import { createRoot, Root } from "react-dom/client"
-import {  } from 'react-dom'
+import { useCallback, useMemo } from "react"
 
 import { atom } from "jotai"
 import { useImmerAtom } from "jotai-immer"
 
 import { defaultApps } from "@/os/apps/defaults"
-import { Window } from "@/os/apps/Window"
 import { useSystem } from "@/os/system"
 
-import { AppAvail, AppRunning, AppsAvail, AppsRunning, RenderApp } from "@/os/apps/types"
+import { AppAvail, AppRunning, AppsAvail, AppsRunning } from "@/os/apps/types"
 
 const atomAppsAvail = atom(defaultApps as AppsAvail)
 const atomAppsRunning = atom({} as AppsRunning)
@@ -21,7 +18,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 export const useApps = () => {
-  const { system } = useSystem()
+  const system = useSystem()
   /**
    * 
    * Apps Avail - Apps Avail - Apps Avail
@@ -136,19 +133,7 @@ export const useApps = () => {
       if (appIsRunning) return
       
       // app is not already running, boot it up!
-      const uaiid = `${system.user.userId}-${appToRun.appId}-${instanceId}`
-
-      const appRoot = renderApp({
-        title: appToRun.title,
-        uaiid: uaiid,
-        app: getAppsAvail[appToRun.appId].app,
-      }, {
-        controlBarLocation: system.settings.controlBarLocation,
-        theme: system.settings.theme,
-        userId: system.user.userId,
-      })
-
-      if (!appRoot) throw Error(`failed to create app root! ${uaiid}`)
+      const uaiid = `${system.data.user.userId}-${appToRun.appId}-${instanceId}`
 
       // open app
       setAppsRunning((draft) => {
@@ -159,7 +144,6 @@ export const useApps = () => {
           menuIndex: 0,
           windowIndex: 0,
           appData: {},
-          appRoot: appRoot,
         }
 
         // shift all indexes up one
@@ -173,26 +157,15 @@ export const useApps = () => {
     } else {
       console.error(`App ${appToRun.appId} is not available`)
     }
-  }, [appsRunningWindows, getAppsAvail, setAppsRunning, system.settings.controlBarLocation, system.settings.theme, system.user.userId])
+  }, [appsRunningWindows, getAppsAvail, setAppsRunning, system.data.user.userId])
 
   const closeApp = useCallback((
     uaiid: string
   ) => {
-    if (typeof window !== 'undefined') {
-      const appRoot = getAppsRunning[uaiid].appRoot
-      const appToClose = document.getElementById(uaiid)
-  
-      if (appRoot && appToClose) {
-        appRoot.unmount()
-        appToClose.style.display = 'none'
-        appToClose.remove()
-      }
-
-      setAppsRunning((draft) => {
-        delete draft[uaiid]
-      })
-    }
-  }, [getAppsRunning, setAppsRunning])
+    setAppsRunning((draft) => {
+      delete draft[uaiid]
+    })
+  }, [setAppsRunning])
 
   
   return {
@@ -211,32 +184,4 @@ export const useApps = () => {
       close: closeApp,
     },
   }
-}
-
-export const renderApp: RenderApp = ({ 
-  title, uaiid, app,
-}, systemData) => {
-  if (document.getElementById(uaiid)) {
-    console.error(`${uaiid} already open`)
-    return null
-  }
-
-  const element = document.createElement('div')
-  element.id = uaiid
-
-  const main = document.getElementById('main')
-  if (!main) return null
-  main.appendChild(element)
-
-  const componentRoot = createRoot(element)
-  componentRoot.render(
-    <Window
-      title={title}
-      uaiid={uaiid}
-    >
-      { app(systemData) }
-    </Window>
-  )
-
-  return componentRoot
 }
