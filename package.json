@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "ahooks": "^3.8.1",
     "cross-env": "^7.0.3",
     "immer": "^10.1.1",
     "immutable": "^4.3.7",

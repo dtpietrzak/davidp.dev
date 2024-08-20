@@ -259,7 +259,7 @@ export const Window: FC<WindowProps> = ({
         onChangeTouchSelectedResize={(value) => setTouchSelectedResize(value)}
         onCaptureInitialCoords={(value) => captureInitialCoords(value)}
       />
-      <div className="w-full h-[calc(100%-18px)] overflow-hidden">
+      <div className="w-full h-[calc(100%-19px)] overflow-hidden">
         <ScrollBarBox>
           {children}
         </ScrollBarBox>
