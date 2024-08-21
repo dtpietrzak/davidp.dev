@@ -1,6 +1,6 @@
 "use client"
 
-import { FC, useEffect, useRef, useState, MouseEvent as ReactMouseEvent, useCallback, useLayoutEffect } from 'react'
+import { FC, useEffect, useRef, useState, MouseEvent as ReactMouseEvent, useCallback } from 'react'
 import { useScroll, useScrolling } from 'react-use'
 import { useThrottleFn } from 'ahooks'
 
@@ -14,15 +14,12 @@ export const ScrollBarBox: FC<ScrollBarBoxProps> = ({
   className,
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null)
-  const contentRef = useRef<HTMLDivElement>(null)
 
   const scroll = useScroll(scrollRef)
   const scrolling = useScrolling(scrollRef)
 
-  const [scrollThumbHeight, setScrollThumbHeight] = 
-    useState<number | null>(null)
-  const [scrollFromTop, setScrollFromTop] = 
-    useState<number | null>(null)
+  const [scrollThumbHeight, setScrollThumbHeight] = useState(0)
+  const [scrollFromTop, setScrollFromTop] = useState(0)
 
   const [dragY, setDragY] = useState<number | null>(null)
   const [scrollBeforeDrag, setScrollBeforeDrag] = useState(0)
@@ -67,9 +64,7 @@ export const ScrollBarBox: FC<ScrollBarBoxProps> = ({
     setScrollFromTop(_scrollFromTop)
   }, { wait: 33 })
 
-  useLayoutEffect(() => { 
-    run()
-  }, [run, scroll.y, scrollRef?.current?.clientHeight, scrollRef?.current?.scrollHeight, contentRef?.current?.clientHeight])
+  useEffect(() => { run() }, [run, scroll.y, scrollRef.current?.clientHeight])
 
   const onMouseMove = useCallback((mouseEvent: MouseEvent | Touch) => {
     if (dragY === null) return
@@ -100,22 +95,21 @@ export const ScrollBarBox: FC<ScrollBarBoxProps> = ({
     >
       <div 
         className={`absolute right-0 w-[7px] rounded-md border border-gray-500/50 hover:bg-gray-500 ${
-          scrollThumbHeight === 0 ? 'hidden' : ''
-        } ${
           scrolling ? 'bg-gray-500' : 'bg-gray-500/30'
         }`}
         style={{
-          top: (scrollFromTop ?? 0) + 10,
-          height: (scrollThumbHeight ?? 0),
+          top: scrollFromTop + 10,
+          height: scrollThumbHeight,
           transition: 'background-color 0.5s ease-out',
         }}
         onMouseDown={(mouseEvent: ReactMouseEvent<HTMLButtonElement | HTMLDivElement, MouseEvent>) => {
           mouseEvent.preventDefault()
+          if (!scrollRef.current) return
           setDragY(mouseEvent.clientY)
-          setScrollBeforeDrag(scrollRef.current?.scrollTop ?? 0)
+          setScrollBeforeDrag(scrollRef.current.scrollTop)
         }}
       />
-      <div ref={contentRef} className={`w-full h-full px-1 pt-1`}>
+      <div className={`w-full h-full px-1 pt-1`}>
         {children}
       </div>
     </div>
