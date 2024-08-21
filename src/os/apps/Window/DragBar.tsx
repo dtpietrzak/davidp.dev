@@ -3,7 +3,6 @@ import { IoCloseCircle } from "react-icons/io5"
 import { RiDragMoveFill } from "react-icons/ri"
 import { useClickAway } from "react-use"
 
-import { useSystem } from "@/os/system"
 import { useApps } from "@/os/apps/useApps"
 
 type DragBarProps = {
@@ -33,7 +32,6 @@ export const DragBar: FC<DragBarProps> = ({
   onChangeTouchSelectedDrag,
   onCaptureInitialCoords,
 }) => {
-  const { system } = useSystem()
   const apps = useApps()
 
   const dragBarClickawayRef = useRef(null)

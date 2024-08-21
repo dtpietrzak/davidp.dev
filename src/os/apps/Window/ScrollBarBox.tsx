@@ -1,8 +1,8 @@
 "use client"
 
-import { useInterval, useSize, useThrottleFn } from 'ahooks'
-import { FC, useEffect, useRef, useState } from 'react'
+import { FC, useEffect, useRef, useState, MouseEvent as ReactMouseEvent, useCallback, useLayoutEffect } from 'react'
 import { useScroll, useScrolling } from 'react-use'
+import { useThrottleFn } from 'ahooks'
 
 type ScrollBarBoxProps = {
   children: React.ReactNode
@@ -16,46 +16,82 @@ export const ScrollBarBox: FC<ScrollBarBoxProps> = ({
   const scrollRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
 
-  let visibleSize = useSize(scrollRef)
-  let contentSize = useSize(contentRef)
-  if (!visibleSize || !contentSize) {
-    visibleSize = { width: 1, height: 1 }
-    contentSize = { width: 2, height: 2 }
-  }
-
   const scroll = useScroll(scrollRef)
   const scrolling = useScrolling(scrollRef)
 
-  const [scrollThumbHeight, setScrollThumbHeight] = useState(0)
-  const [scrollFromTop, setScrollFromTop] = useState(0)
+  const [scrollThumbHeight, setScrollThumbHeight] = 
+    useState<number | null>(null)
+  const [scrollFromTop, setScrollFromTop] = 
+    useState<number | null>(null)
 
-  const { run } = useThrottleFn(
-    () => {
-      const _scrollThumbHeight = Math.min(
-        (visibleSize.height / contentSize.height) * visibleSize.height,
-        visibleSize.height,
-      )
-      if (contentSize.height <= visibleSize.height) {
-        setScrollThumbHeight(0)
-        setScrollFromTop(0)
-        return
-      }
-      const maxScrollableHeight = contentSize.height - visibleSize.height
-      const maxScrollThumbTop = visibleSize.height - _scrollThumbHeight
-      const _scrollFromTop = (scroll.y / maxScrollableHeight) * maxScrollThumbTop
+  const [dragY, setDragY] = useState<number | null>(null)
+  const [scrollBeforeDrag, setScrollBeforeDrag] = useState(0)
 
+  const { run } = useThrottleFn(() => {
+    if (scrollRef.current === null) return
+    const clientHeight = scrollRef.current.clientHeight
+    const scrollHeight = scrollRef.current.scrollHeight
+
+    const _scrollThumbHeight = Math.min(
+      (clientHeight / scrollHeight) * clientHeight,
+      clientHeight,
+    )
+    if (scrollHeight <= clientHeight) {
+      setScrollThumbHeight(0)
+      setScrollFromTop(0)
+      return
+    }
+    const maxScrollableHeight = scrollHeight - clientHeight
+    const maxScrollThumbTop = clientHeight - _scrollThumbHeight
+    const _scrollFromTop = (scroll.y / maxScrollableHeight) * maxScrollThumbTop
+
+    if (_scrollFromTop < -64) {
       setScrollThumbHeight(_scrollThumbHeight)
-      setScrollFromTop(_scrollFromTop)
-    },
-    { wait: 33 },
-  )
+      setScrollFromTop(-32)
+      return
+    } else if (_scrollFromTop < 0) {
+      setScrollThumbHeight(_scrollThumbHeight)
+      setScrollFromTop(_scrollFromTop*0.5)
+      return
+    } else if (_scrollFromTop > maxScrollThumbTop + 64) {
+      setScrollThumbHeight(_scrollThumbHeight)
+      setScrollFromTop(maxScrollThumbTop + 32)
+      return
+    } else if (_scrollFromTop > maxScrollThumbTop) {
+      setScrollThumbHeight(_scrollThumbHeight)
+      setScrollFromTop(_scrollFromTop*0.5 + maxScrollThumbTop*0.5)
+      return
+    }
+
+    setScrollThumbHeight(_scrollThumbHeight)
+    setScrollFromTop(_scrollFromTop)
+  }, { wait: 33 })
+
+  useLayoutEffect(() => { 
+    run()
+  }, [run, scroll.y, scrollRef?.current?.clientHeight, scrollRef?.current?.scrollHeight, contentRef?.current?.clientHeight])
+
+  const onMouseMove = useCallback((mouseEvent: MouseEvent | Touch) => {
+    if (dragY === null) return
+    if (scrollRef.current === null) return
+    const moveY = dragY - mouseEvent.clientY
+    scrollRef.current.scrollTop = scrollBeforeDrag - moveY
+  }, [dragY, scrollBeforeDrag])
+
+  const onMouseUp = () => {
+    setDragY(null)
+    setScrollBeforeDrag(0)
+  }
 
   useEffect(() => {
-    run()
-  }, [run, scroll.y, visibleSize.height, contentSize.height])
-
-  console.log("contentSize.height", contentSize.height)
-  console.log("visibleSize.height", visibleSize.height)
+    if (dragY === null) return
+    addEventListener('mousemove', onMouseMove)
+    addEventListener('mouseup', onMouseUp)
+    return () => {
+      removeEventListener('mousemove', onMouseMove)
+      removeEventListener('mouseup', onMouseUp)
+    }
+  }, [onMouseMove, dragY])
   
   return (
     <div
@@ -63,19 +99,23 @@ export const ScrollBarBox: FC<ScrollBarBoxProps> = ({
       className={`w-full h-full scrollbar-hide overflow-scroll ${className ?? ''}`}
     >
       <div 
-        className={`absolute right-0 w-[7px] rounded-md hover:bg-gray-500 ${
+        className={`absolute right-0 w-[7px] rounded-md border border-gray-500/50 hover:bg-gray-500 ${
+          scrollThumbHeight === 0 ? 'hidden' : ''
+        } ${
           scrolling ? 'bg-gray-500' : 'bg-gray-500/30'
         }`}
         style={{
-          top: scrollFromTop + 7,
-          height: scrollThumbHeight,
+          top: (scrollFromTop ?? 0) + 10,
+          height: (scrollThumbHeight ?? 0),
           transition: 'background-color 0.5s ease-out',
         }}
+        onMouseDown={(mouseEvent: ReactMouseEvent<HTMLButtonElement | HTMLDivElement, MouseEvent>) => {
+          mouseEvent.preventDefault()
+          setDragY(mouseEvent.clientY)
+          setScrollBeforeDrag(scrollRef.current?.scrollTop ?? 0)
+        }}
       />
-      <div
-        ref={contentRef}
-        className={`w-full px-1 pt-1 ${contentSize.height <= visibleSize.height ? 'h-full' : 'h-fit-content'}`}
-      >
+      <div ref={contentRef} className={`w-full h-full px-1 pt-1`}>
         {children}
       </div>
     </div>
