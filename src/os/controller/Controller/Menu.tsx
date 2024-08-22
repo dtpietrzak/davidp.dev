@@ -1,5 +1,5 @@
-import { FC } from "react"
-import { ControllerBiLocation, ControllerOptions } from "@/os/controller/Controller/types"
+import { FC } from 'react'
+import { ControllerBiLocation, ControllerOptions } from '@/os/controller/Controller/types'
 
 export type MenuItem = {
   icon: string
@@ -85,7 +85,7 @@ export const Menu: FC<MenuProps> = ({
                     <></>
                 }
                 <button
-                  className={`flex font-sm !text-[0.9em] items-center justify-start w-full py-2 px-4 hover:bg-gray-100/60 dark:hover:bg-gray-500/60 cursor-pointer rounded-xl my-[2px] shadow-none hover:shadow`}
+                  className={'flex font-sm !text-[0.9em] items-center justify-start w-full py-2 px-4 hover:bg-gray-100/60 dark:hover:bg-gray-500/60 cursor-pointer rounded-xl my-[2px] shadow-none hover:shadow'}
                   onClick={() => {
                     item.onClick()
                   }}

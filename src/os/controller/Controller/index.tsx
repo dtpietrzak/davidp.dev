@@ -1,20 +1,20 @@
-"use client"
+'use client'
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useClickAway, useWindowSize } from 'react-use'
-import { useMousePosition } from "@/hooks/useMousePosition"
+import { useMousePosition } from '@/hooks/useMousePosition'
 
-import { BiWindows, BiDotsVertical } from "react-icons/bi"
-import { MdMenuOpen } from "react-icons/md"
-import { IoIosApps } from "react-icons/io"
-import { RiSettings3Line, RiAccountBoxLine } from "react-icons/ri"
-import { flushSync } from "react-dom"
+import { BiWindows, BiDotsVertical } from 'react-icons/bi'
+import { MdMenuOpen } from 'react-icons/md'
+import { IoIosApps } from 'react-icons/io'
+import { RiSettings3Line, RiAccountBoxLine } from 'react-icons/ri'
+import { flushSync } from 'react-dom'
 
-import { useApps } from "@/os/apps"
-import { ControllerButton } from "@/os/controller/Controller/ControllerButton"
-import { Menu, MenuItem } from "@/os/controller/Controller/Menu"
-import { ControllerBiLocation, ControllerOptions } from "@/os/controller/Controller/types"
-import { useSystem } from "@/os/system"
+import { useApps } from '@/os/apps'
+import { ControllerButton } from '@/os/controller/Controller/ControllerButton'
+import { Menu, MenuItem } from '@/os/controller/Controller/Menu'
+import { ControllerBiLocation, ControllerOptions } from '@/os/controller/Controller/types'
+import { useSystem } from '@/os/system'
 
 let timeInControllerHitbox = 0
 
@@ -358,10 +358,10 @@ export const Controller = () => {
         {
           controllerFocused ? 
             <BiWindows 
-              className={`dark:text-white text-black drop-shadow-[0px_0px_5px_rgba(255,255,255,0.25)]`} size={24}
+              className={'dark:text-white text-black drop-shadow-[0px_0px_5px_rgba(255,255,255,0.25)]'} size={24}
             /> : 
             <BiDotsVertical 
-              className={`dark:text-white text-black drop-shadow-[0px_0px_5px_rgba(255,255,255,0.25)]`} size={24}
+              className={'dark:text-white text-black drop-shadow-[0px_0px_5px_rgba(255,255,255,0.25)]'} size={24}
             />
         }
       </div>

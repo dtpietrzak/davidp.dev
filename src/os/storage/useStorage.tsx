@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { atom } from "jotai"
-import { useImmerAtom } from "jotai-immer"
-import { mergeDeep } from "immutable"
+import { atom } from 'jotai'
+import { useImmerAtom } from 'jotai-immer'
+import { mergeDeep } from 'immutable'
 
 // export const useStorage = () => {
 

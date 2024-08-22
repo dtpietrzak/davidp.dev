@@ -1,7 +1,7 @@
-"use client"
+'use client'
 
-import { createContext, useContext, useState } from "react"
-import { ToolTip } from "@/components/ToolTip/ToolTip"
+import { createContext, useContext, useState } from 'react'
+import { ToolTip } from '@/components/ToolTip/ToolTip'
 
 const ToolTipContext = createContext({
   openToolTip: (text: string) => {},
@@ -13,7 +13,7 @@ type ToolTipProviderProps = {
 }
 
 export const ToolTipProvider = ({ children }: ToolTipProviderProps) => {
-  const [toolTipText, setToolTipText] = useState("")
+  const [toolTipText, setToolTipText] = useState('')
   const [toolTipVisible, setToolTipVisible] = useState(false)
 
   const openToolTip = (text: string) => {
@@ -22,7 +22,7 @@ export const ToolTipProvider = ({ children }: ToolTipProviderProps) => {
   }
 
   const closeToolTip = () => {
-    setToolTipText("")
+    setToolTipText('')
     setToolTipVisible(false)
   }
 

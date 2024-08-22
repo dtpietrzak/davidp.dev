@@ -1,7 +1,7 @@
-"use client"
+'use client'
 
-import dynamic from "next/dynamic"
-import { Loader, type Application } from "@/os/apps"
+import dynamic from 'next/dynamic'
+import { Loader, type Application } from '@/os/apps'
 
 const FileExplorer = dynamic(() => (
   import('./FileExplorer').then((mod) => mod.FileExplorer)
@@ -11,9 +11,9 @@ const FileExplorer = dynamic(() => (
 })
 
 export const fileExplorer: Application = {
-  title: "File Explorer",
-  icon: "",
+  title: 'File Explorer',
+  icon: '',
   multiInstance: false,
-  appId: "file-explorer",
+  appId: 'file-explorer',
   app: (systemData) => <FileExplorer {...systemData} />,
 }

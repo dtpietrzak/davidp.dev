@@ -1,11 +1,11 @@
-"use client"
+'use client'
 
-import { useApps } from "@/os/apps"
-import { RenderApp, Window } from "@/os/apps"
-import { AppRunning } from "@/os/apps/types"
-import { useSystem } from "@/os/system"
+import { useApps } from '@/os/apps'
+import { RenderApp, Window } from '@/os/apps'
+import { AppRunning } from '@/os/apps/types'
+import { useSystem } from '@/os/system'
 
-import { FileExplorer } from "@/apps/FileExplorer/FileExplorer"
+import { FileExplorer } from '@/apps/FileExplorer/FileExplorer'
 
 export default function Desktop() {
   const system = useSystem()

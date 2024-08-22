@@ -1,6 +1,6 @@
-import { FC, useRef, MouseEvent as ReactMouseEvent } from "react"
-import { useClickAway } from "react-use"
-import { ResizeDirections } from "@/os/apps/Window/types"
+import { FC, useRef, MouseEvent as ReactMouseEvent } from 'react'
+import { useClickAway } from 'react-use'
+import { ResizeDirections } from '@/os/apps/Window/types'
 
 const directionClassNameMap = {
   ne: '-top-1 -right-2 cursor-nesw-resize',

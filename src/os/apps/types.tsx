@@ -1,12 +1,12 @@
-import { SystemSettings, SystemUser } from "@/os/system/types"
-import { Root } from "react-dom/client"
+import { SystemSettings, SystemUser } from '@/os/system/types'
+import { Root } from 'react-dom/client'
 
 // we want to explicitly choose which system properties are given to apps
 // this way we dont accidentally willy nilly give everything
 // (of course really skilled people can bypass it anyway,
 // but that's beside the point, this is a mockery of an OS in the first place)
-type SystemSettingsDataForApp = Pick<SystemSettings, "controlBarLocation" | "theme">
-type SystemUserDataForApp = Pick<SystemUser, "userId">
+type SystemSettingsDataForApp = Pick<SystemSettings, 'controlBarLocation' | 'theme'>
+type SystemUserDataForApp = Pick<SystemUser, 'userId'>
 export type SystemDataForApp = SystemSettingsDataForApp & SystemUserDataForApp
 export type AppComponent = (systemData: SystemDataForApp) => React.ReactNode
 

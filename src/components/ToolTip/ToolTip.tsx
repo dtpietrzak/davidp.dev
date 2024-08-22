@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import { FC, LegacyRef } from "react"
+import { FC, LegacyRef } from 'react'
 
-import { useMeasure, useWindowSize } from "react-use"
-import { useMousePosition } from "@/hooks/useMousePosition"
+import { useMeasure, useWindowSize } from 'react-use'
+import { useMousePosition } from '@/hooks/useMousePosition'
 
 type ToolTipProps = {
   show: boolean
@@ -12,7 +12,7 @@ type ToolTipProps = {
 
 export const ToolTip: FC<ToolTipProps> = ({
   show = false,
-  text = "",
+  text = '',
 }) => {
   const { x, y } = useMousePosition()
   const { width: windowWidth, height: windowHeight } = useWindowSize()
@@ -23,7 +23,7 @@ export const ToolTip: FC<ToolTipProps> = ({
   return (
     <div
       ref={ref as LegacyRef<HTMLDivElement>}
-      className={`fixed z-5000 py-1 px-2 bg-gray-800/30 border border-gray-400/50 text-white/80 rounded-lg max-w-32 backdrop-blur-xl`}
+      className={'fixed z-5000 py-1 px-2 bg-gray-800/30 border border-gray-400/50 text-white/80 rounded-lg max-w-32 backdrop-blur-xl'}
       style={{
         top: y > (windowHeight - (elementHeight + 30)) ? 
           (y - elementHeight - 10) : y + 10,

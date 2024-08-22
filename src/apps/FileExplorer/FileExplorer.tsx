@@ -1,7 +1,7 @@
-"use client"
+'use client'
 
-import { AppComponent } from "@/os/apps"
-import { useSystem } from "@/os/system"
+import { AppComponent } from '@/os/apps'
+import { useSystem } from '@/os/system'
 
 export const FileExplorer: AppComponent = () => {
   return (

@@ -1,5 +1,5 @@
-import { FC } from "react"
-import { IconType } from "react-icons"
+import { FC } from 'react'
+import { IconType } from 'react-icons'
 
 type ControllerButtonProps = {
   Icon: IconType
@@ -15,7 +15,7 @@ export const ControllerButton: FC<ControllerButtonProps> = ({
   size,
 }) => {
   const iconSize = () => (controllerFocused ? 24 : 12)
-  const iconColor = () => `dark:text-white text-black`
+  const iconColor = () => 'dark:text-white text-black'
 
   return (
     <button className="flex justify-center items-center transition duration-200 h-[52px] w-[52px] cursor-pointer hover:bg-gray-100/60 dark:hover:bg-gray-500/60" onClick={onClick}>

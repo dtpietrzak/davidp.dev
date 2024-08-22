@@ -1,9 +1,9 @@
-import { FC, useRef, MouseEvent as ReactMouseEvent } from "react"
-import { IoCloseCircle } from "react-icons/io5"
-import { RiDragMoveFill } from "react-icons/ri"
-import { useClickAway } from "react-use"
+import { FC, useRef, MouseEvent as ReactMouseEvent } from 'react'
+import { IoCloseCircle } from 'react-icons/io5'
+import { RiDragMoveFill } from 'react-icons/ri'
+import { useClickAway } from 'react-use'
 
-import { useApps } from "@/os/apps/useApps"
+import { useApps } from '@/os/apps/useApps'
 
 type DragBarProps = {
   title: string

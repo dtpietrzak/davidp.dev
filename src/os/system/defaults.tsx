@@ -1,19 +1,19 @@
-import { System, SystemSettings, SystemUser } from "@/os/system/types"
+import { System, SystemSettings, SystemUser } from '@/os/system/types'
 
 const defaultUserSettings: SystemSettings = {
   theme: {
-    value: "dark",
+    value: 'dark',
     sync: false,
   },
   controlBarLocation: {
-    value: "right",
+    value: 'right',
     sync: false,
   }
 }
 
 const defaultUser: SystemUser = {
-  userId: "guest",
-  name: "Guest",
+  userId: 'guest',
+  name: 'Guest',
   image: undefined,
 }
 

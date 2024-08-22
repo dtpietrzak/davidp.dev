@@ -1,14 +1,14 @@
-"use client"
+'use client'
 
-import { useCallback, useMemo } from "react"
+import { useCallback, useMemo } from 'react'
 
-import { atom } from "jotai"
-import { useImmerAtom } from "jotai-immer"
+import { atom } from 'jotai'
+import { useImmerAtom } from 'jotai-immer'
 
-import { defaultApps } from "@/os/apps/defaults"
-import { useSystem } from "@/os/system"
+import { defaultApps } from '@/os/apps/defaults'
+import { useSystem } from '@/os/system'
 
-import { AppAvail, AppRunning, AppsAvail, AppsRunning } from "@/os/apps/types"
+import { AppAvail, AppRunning, AppsAvail, AppsRunning } from '@/os/apps/types'
 
 const atomAppsAvail = atom(defaultApps as AppsAvail)
 const atomAppsRunning = atom({} as AppsRunning)

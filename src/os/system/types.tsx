@@ -3,8 +3,8 @@ type SystemSetting<T> = {
   sync: boolean
 }
 export type SystemSettings = {
-  theme: SystemSetting<"light" | "dark">
-  controlBarLocation: SystemSetting<"top" | "right" | "bottom" | "left">
+  theme: SystemSetting<'light' | 'dark'>
+  controlBarLocation: SystemSetting<'top' | 'right' | 'bottom' | 'left'>
 }
 
 export type SystemUser = {

@@ -1,11 +1,11 @@
-"use client"
+'use client'
 
-import { atom } from "jotai"
-import { useImmerAtom } from "jotai-immer"
-import { mergeDeep } from "immutable"
-import { defaultSystem } from "@/os/system/defaults"
-import { System, SystemSettings, SystemUser } from "@/os/system/types"
-import { useEffect } from "react"
+import { atom } from 'jotai'
+import { useImmerAtom } from 'jotai-immer'
+import { mergeDeep } from 'immutable'
+import { defaultSystem } from '@/os/system/defaults'
+import { System, SystemSettings, SystemUser } from '@/os/system/types'
+import { useEffect } from 'react'
 
 const systemAtom = atom<System>(defaultSystem)
 
@@ -27,7 +27,7 @@ export const useSystem = () => {
 
   const updateUser = (partialUser: Partial<SystemUser>) => {
     if (partialUser.userId) {
-      throw new Error("Cannot update user id")
+      throw new Error('Cannot update user id')
     }
     set((draft) => {
       draft.user = mergeDeep(draft.user, partialUser)
