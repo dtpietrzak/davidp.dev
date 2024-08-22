@@ -1,15 +1,16 @@
 module.exports = {
-  plugins: ["@stylistic"],
-  extends: "next/core-web-vitals",
+  plugins: ['@stylistic'],
+  extends: 'next/core-web-vitals',
   rules: {
-    "semi": ["error", "never"],
+    'semi': ['error', 'never'],
+    'quotes': ['error', 'single'],
     '@stylistic/indent': ['error', 2],
-    "prefer-const": "warn",
-    "object-curly-spacing": ["warn", "always", { 
-      "objectsInObjects": false,
-      "arraysInObjects": false,
+    'prefer-const': 'warn',
+    'object-curly-spacing': ['warn', 'always', { 
+      'objectsInObjects': false,
+      'arraysInObjects': false,
     }],
-    "array-bracket-spacing": ["warn", "never"],
+    'array-bracket-spacing': ['warn', 'never'],
   }
 }
   

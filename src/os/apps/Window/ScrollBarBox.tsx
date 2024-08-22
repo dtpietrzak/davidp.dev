@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { FC, useEffect, useRef, useState, MouseEvent as ReactMouseEvent, useCallback } from 'react'
 import { useScroll, useScrolling } from 'react-use'
@@ -62,7 +62,7 @@ export const ScrollBarBox: FC<ScrollBarBoxProps> = ({
 
     setScrollThumbHeight(_scrollThumbHeight)
     setScrollFromTop(_scrollFromTop)
-  }, { wait: 33 })
+  }, { wait: 16 })
 
   useEffect(() => { run() }, [run, scroll.y, scrollRef.current?.clientHeight])
 
@@ -70,7 +70,7 @@ export const ScrollBarBox: FC<ScrollBarBoxProps> = ({
     if (dragY === null) return
     if (scrollRef.current === null) return
     const moveY = dragY - mouseEvent.clientY
-    scrollRef.current.scrollTop = scrollBeforeDrag - moveY
+    scrollRef.current.scrollTop = scrollBeforeDrag - moveY * (scrollRef.current.scrollHeight / scrollRef.current.clientHeight)
   }, [dragY, scrollBeforeDrag])
 
   const onMouseUp = () => {
@@ -109,7 +109,7 @@ export const ScrollBarBox: FC<ScrollBarBoxProps> = ({
           setScrollBeforeDrag(scrollRef.current.scrollTop)
         }}
       />
-      <div className={`w-full h-full px-1 pt-1`}>
+      <div className={'w-full h-full px-1 pt-1'}>
         {children}
       </div>
     </div>

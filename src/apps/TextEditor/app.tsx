@@ -1,18 +1,18 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { Application } from "@/os/apps"
+import { useState } from 'react'
+import { Application } from '@/os/apps'
 
 export const textEditor: Application = {
-  title: "Text Editor",
-  icon: "",
+  title: 'Text Editor',
+  icon: '',
   multiInstance: false,
-  appId: "text-editor",
+  appId: 'text-editor',
   app: (systemData) => <TextEditor />,
 }
 
 const TextEditor = () => {
-  const [text, setText] = useState<string>("")
+  const [text, setText] = useState<string>('')
 
   return (
     <div className="w-full h-full">

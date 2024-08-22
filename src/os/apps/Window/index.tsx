@@ -1,14 +1,14 @@
-"use client"
+'use client'
 
-import { useEffect, useState, MouseEvent as ReactMouseEvent, useCallback, FC, useRef } from "react"
+import { useEffect, useState, MouseEvent as ReactMouseEvent, useCallback, FC, useRef } from 'react'
 
-import { useClickAway } from "react-use"
+import { useClickAway } from 'react-use'
 
-import { DragBar } from "@/os/apps/Window/DragBar"
-import { ResizeButton } from "@/os/apps/Window/ResizeButton"
-import { ScrollBarBox } from "@/os/apps/Window/ScrollBarBox"
+import { DragBar } from '@/os/apps/Window/DragBar'
+import { ResizeButton } from '@/os/apps/Window/ResizeButton'
+import { ScrollBarBox } from '@/os/apps/Window/ScrollBarBox'
 
-import { type ResizeDirections } from "@/os/apps/Window/types"
+import { type ResizeDirections } from '@/os/apps/Window/types'
 
 // there is a bug in the dragging on mobile code, that caused the touchSelectedDrag to flash false/true/false at the end of a legitimate drag
 

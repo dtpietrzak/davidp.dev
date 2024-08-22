@@ -1,30 +1,29 @@
-import { fileExplorer } from "@/apps/FileExplorer/app"
-import { textEditor } from "@/apps/TextEditor/app"
-import { AppsAvail } from "@/os/apps/types"
+import { fileExplorer } from '@/apps/FileExplorer/app'
+import { textEditor } from '@/apps/TextEditor/app'
+import { systemInformation } from '@/apps/SystemInformation/app'
+import { AppsAvail } from '@/os/apps/types'
 
 export const defaultApps: AppsAvail = {
-  "file-explorer": {
+  'file-explorer': {
     ...fileExplorer,
     sync: false,
     index: 0,
   },
-  "text-editor": {
+  'text-editor': {
     ...textEditor,
     sync: false,
     index: 1,
   },
-  "web-browser": {
+  'web-browser': {
     ...fileExplorer,
     sync: false,
     index: 0,
     appId: 'web-browser',
     title: 'Web Browser',
   },
-  "system-information": {
-    ...fileExplorer,
+  'system-information': {
+    ...systemInformation,
     sync: false,
-    index: 0,
-    appId: 'system-information',
-    title: 'System Information',
+    index: 2,
   },
 }
