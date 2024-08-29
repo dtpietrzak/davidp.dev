@@ -101,7 +101,21 @@ export const Window: FC<WindowProps> = ({
   const _setHeight = (height: number) => setHeight(clampHeight(height))
 
   const [isDragging, setIsDragging] = useState(false)
+  useEffect(() => {
+    if (isDragging) {
+      document.body.classList.add('no-select')
+    } else {
+      document.body.classList.remove('no-select')
+    }
+  }, [isDragging])
   const [isResizing, setIsResizing] = useState<ResizeDirections | null>(null)
+  useEffect(() => {
+    if (isResizing) {
+      document.body.classList.add('no-select')
+    } else {
+      document.body.classList.remove('no-select')
+    }
+  }, [isResizing])
 
   const [initialX, setInitialX] = useState(_x)
   const [initialY, setInitialY] = useState(_y)

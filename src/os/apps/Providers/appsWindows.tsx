@@ -57,8 +57,6 @@ export const AppsWindowsProvider = ({ children }: { children: React.ReactNode })
   }, [_setAppsWindows])
 
   useEffect(() => {
-    console.log('appsWindows', appsWindows)
-
     if (!initialized) {
       setInitialized(true)
       const appsWindowsLs = localStorage.getItem(appsWindowsLsKey)

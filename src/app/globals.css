@@ -155,3 +155,10 @@ body {
     opacity: 0.8;
   }
 }
+
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
