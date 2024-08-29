@@ -15,7 +15,7 @@ const getDefaults = () => {
   defaultIndex++
   return {
     sync: false,
-    menuIndex: 0,
+    menuIndex: defaultIndex,
     ...defaultWindowLocation,
   }
 }
@@ -45,5 +45,6 @@ export const defaultApps: AppsAvail = {
   'system-information': {
     ...systemInformation,
     ...getDefaults(),
+    multiInstance: true,
   },
 }

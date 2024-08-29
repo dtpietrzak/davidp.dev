@@ -83,10 +83,12 @@ export const Window: FC<WindowProps> = ({
   title,
   children, 
 }) => {
-  const appsAvailable = useAppsAvailable()
   const appsWindows = useAppsWindows()
-
   const [currentApp, setCurrentApp] = useImmer(appsWindows.object[uaiid])
+  useEffect(() => {
+    setCurrentApp(appsWindows.object[uaiid])
+  }, [appsWindows, setCurrentApp, uaiid])
+
   const openedLocation = locationMultiInstanceHandler(currentApp)
 
   const [_x, setX] = useState(openedLocation.x)
@@ -262,10 +264,14 @@ export const Window: FC<WindowProps> = ({
         height: _height,
         minHeight: minHeight,
         minWidth: minWidth,
+        zIndex: currentApp.zIndex + 2000,
+      }}
+      onMouseDown={() => {
+        appsWindows.focus(uaiid)
       }}
     >
       <DragBar 
-        title={title}
+        title={`${title} - ${currentApp.zIndex}`}
         uaiid={uaiid}
         isDragging={isDragging}
         onChangeIsDragging={(value) => setIsDragging(value)}

@@ -37,8 +37,6 @@ export const AppsRunningProvider = ({ children }: { children: React.ReactNode })
    */
   const [appsRunning, setAppsRunning] = useImmer({} as AppsRunning)
   useEffect(() => {
-    console.log('appsWindows.refresh', appsWindows.refresh)
-
     if (initialized && appsWindows.initialized) {
 
     } else {
@@ -59,9 +57,7 @@ export const AppsRunningProvider = ({ children }: { children: React.ReactNode })
               } as AppRunning
             }
           }).filter(Boolean) as AppRunning[]
-
-        console.log('appsRunningFromWindows', appsWindows)
-
+          
         setAppsRunning((draft) => {
           appsRunningFromWindows.forEach((appRunning) => {
             draft[appRunning.uaiid] = appRunning
@@ -97,8 +93,16 @@ export const AppsRunningProvider = ({ children }: { children: React.ReactNode })
             instances.push(appAlreadyRunning.instanceId)
           }
         })
-        instances.sort((a, b) => a - b)
-        instanceId = instances[instances.length] + 1
+
+        if (instances.length === 0) {
+          instanceId = 0
+        } else {
+          instances.sort((a, b) => a - b)
+          instanceId = instances[instances.length - 1] + 1
+          if (Number.isNaN(instanceId)) {
+            instanceId = 0
+          }
+        }
       }
 
       // check if app is already running
