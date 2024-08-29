@@ -278,7 +278,7 @@ export const Window: FC<WindowProps> = ({
         height: _height,
         minHeight: minHeight,
         minWidth: minWidth,
-        zIndex: currentApp.zIndex + 2000,
+        zIndex: currentApp.zIndex + 1000,
       }}
       onMouseDown={() => {
         appsWindows.focus(uaiid)
