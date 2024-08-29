@@ -161,7 +161,8 @@ export const Controller = () => {
       title: `${app.appId}-${app.instanceId}`,
       menuId: `${app.appId}-${app.instanceId}`,
       onClick: () => {
-        console.log(appsRunning)
+        const uaiid = `${system.data.user.userId}-${app.appId}-${app.instanceId}`
+        appsWindows.focus(uaiid)
       }
     }))
   }

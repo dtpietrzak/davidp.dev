@@ -57,7 +57,7 @@ export const AppsRunningProvider = ({ children }: { children: React.ReactNode })
               } as AppRunning
             }
           }).filter(Boolean) as AppRunning[]
-          
+
         setAppsRunning((draft) => {
           appsRunningFromWindows.forEach((appRunning) => {
             draft[appRunning.uaiid] = appRunning
@@ -66,10 +66,6 @@ export const AppsRunningProvider = ({ children }: { children: React.ReactNode })
       }
     }
   }, [appsAvailable.object, appsWindows.initialized, appsWindows.opened, setAppsRunning, system.data.user.userId, appsWindows])
-
-  useEffect(() => {
-    console.log('appsRunning', appsRunning)
-  }, [appsRunning])
 
   const appsRunningMenu = useMemo(() => {
     return Object.values(appsRunning).sort(
