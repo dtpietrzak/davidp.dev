@@ -9,6 +9,10 @@ import { ResizeButton } from '@/os/apps/Window/ResizeButton'
 import { ScrollBarBox } from '@/os/apps/Window/ScrollBarBox'
 
 import { type ResizeDirections } from '@/os/apps/Window/types'
+import { useAppsAvailable, useAppsWindows, type AppAvail } from '@/os/apps'
+import { useImmer } from 'use-immer'
+import { useDebounceEffect } from 'ahooks'
+import { AppWindow } from '@/os/apps/types'
 
 // there is a bug in the dragging on mobile code, that caused the touchSelectedDrag to flash false/true/false at the end of a legitimate drag
 
@@ -38,27 +42,60 @@ const clampHeight = (height: number) => {
 }
 
 type WindowProps = {
-  title: string
   uaiid: string
+  userId: string
+  appId: string
+  instanceId: number
+  title: string
   children: React.ReactNode
 }
 
+const locationMultiInstanceHandler = (currentApp: AppWindow) => {
+  // if (currentApp.multiInstance) {
+  //   return {
+  //     x: currentApp.x + currentApp.zIndex * 20,
+  //     y: currentApp.y + currentApp.zIndex * 20,
+  //     width: currentApp.width,
+  //     height: currentApp.height,
+  //   }
+  // } else {
+  //   return {
+  //     x: currentApp.x,
+  //     y: currentApp.y,
+  //     width: currentApp.width,
+  //     height: currentApp.height,
+  //   }
+  // }
+
+  return {
+    x: currentApp.x,
+    y: currentApp.y,
+    width: currentApp.width,
+    height: currentApp.height,
+  }
+}
+
 export const Window: FC<WindowProps> = ({
-  title,
   uaiid,
+  userId,
+  appId,
+  instanceId,
+  title,
   children, 
 }) => {
-  const id = useCallback((_id: string) => {
-    return `window-${uaiid}-${_id}`
-  }, [uaiid])
+  const appsAvailable = useAppsAvailable()
+  const appsWindows = useAppsWindows()
 
-  const [_x, setX] = useState(localStorage.getItem(id('x')) ? parseInt(localStorage.getItem(id('x'))!) : 7)
+  const [currentApp, setCurrentApp] = useImmer(appsWindows.object[uaiid])
+  const openedLocation = locationMultiInstanceHandler(currentApp)
+
+  const [_x, setX] = useState(openedLocation.x)
   const _setX = (x: number) => setX(clampX(x, window?.innerWidth ?? 0))
-  const [_y, setY] = useState(localStorage.getItem(id('y')) ? parseInt(localStorage.getItem(id('y'))!) : 12)
+  const [_y, setY] = useState(openedLocation.y)
   const _setY = (y: number) => setY(clampY(y, window?.innerHeight ?? 0))
-  const [_width, setWidth] = useState(localStorage.getItem(id('width')) ? parseInt(localStorage.getItem(id('width'))!) : minWidth)
+  const [_width, setWidth] = useState(openedLocation.width)
   const _setWidth = (width: number) => setWidth(clampWidth(width))
-  const [_height, setHeight] = useState(localStorage.getItem(id('height')) ? parseInt(localStorage.getItem(id('height'))!) : minHeight)
+  const [_height, setHeight] = useState(openedLocation.height)
   const _setHeight = (height: number) => setHeight(clampHeight(height))
 
   const [isDragging, setIsDragging] = useState(false)
@@ -125,10 +162,12 @@ export const Window: FC<WindowProps> = ({
     const mouseUp = () => {
       setIsDragging(false)
       setIsResizing(null)
-      localStorage.setItem(id('x'), _x.toString())
-      localStorage.setItem(id('y'), _y.toString())
-      localStorage.setItem(id('width'), _width.toString())
-      localStorage.setItem(id('height'), _height.toString())
+      setCurrentApp((draft) => {
+        draft.x = _x
+        draft.y = _y
+        draft.width = _width
+        draft.height = _height
+      })
     }
     addEventListener('mouseup', mouseUp)
     addEventListener('touchend', mouseUp)
@@ -138,7 +177,16 @@ export const Window: FC<WindowProps> = ({
       removeEventListener('touchend', mouseUp)
       removeEventListener('touchcancel', mouseUp)
     }
-  }, [_height, _width, _x, _y, id])
+  }, [_height, _width, _x, _y, setCurrentApp])
+
+  useDebounceEffect(() => {
+    appsWindows.relocate(uaiid, {
+      x: currentApp.x,
+      y: currentApp.y,
+      width: currentApp.width,
+      height: currentApp.height,
+    })
+  }, [currentApp, uaiid], { wait: 250 })
 
   const convertMouseOrTouchToMouse = (mouseEvent: MouseEvent | TouchEvent) => {
     if (mouseEvent.type === 'touchmove') {

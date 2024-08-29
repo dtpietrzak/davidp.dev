@@ -1,6 +1,11 @@
-import { useApps } from '@/os/apps/useApps'
-import { Application, AppComponent, RenderApp } from '@/os/apps/types'
+'use client'
+
+import { AppsProvider } from '@/os/apps/useApps'
+import { useAppsAvailable } from '@/os/apps/Providers/appsAvail'
+import { useAppsWindows } from '@/os/apps/Providers/appsWindows'
+import { useAppsRunning } from '@/os/apps/Providers/appsRunning'
+import { Application, AppComponent, RenderApp, AppAvail } from '@/os/apps/types'
 import { Loader } from '@/os/apps/Window/Loader'
 import { Window } from '@/os/apps/Window'
 
-export { useApps, Window, type RenderApp, type Application, type AppComponent, Loader }
+export { AppsProvider, useAppsAvailable, useAppsWindows, useAppsRunning, Window, type RenderApp, type Application, type AppComponent, type AppAvail, Loader }

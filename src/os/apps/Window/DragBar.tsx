@@ -1,9 +1,11 @@
+'use client'
+
 import { FC, useRef, MouseEvent as ReactMouseEvent } from 'react'
 import { IoCloseCircle } from 'react-icons/io5'
 import { RiDragMoveFill } from 'react-icons/ri'
 import { useClickAway } from 'react-use'
 
-import { useApps } from '@/os/apps/useApps'
+import { useAppsRunning } from '@/os/apps'
 
 type DragBarProps = {
   title: string
@@ -32,7 +34,7 @@ export const DragBar: FC<DragBarProps> = ({
   onChangeTouchSelectedDrag,
   onCaptureInitialCoords,
 }) => {
-  const apps = useApps()
+  const appsRunning = useAppsRunning()
 
   const dragBarClickawayRef = useRef(null)
   useClickAway(dragBarClickawayRef, () => {
@@ -103,7 +105,7 @@ export const DragBar: FC<DragBarProps> = ({
             </div>
             :
             <button onClick={() => {
-              apps.running.close(uaiid)
+              appsRunning.close(uaiid)
             }}>
               <IoCloseCircle size={18} className="opacity-80 hover:opacity-100" />
             </button>

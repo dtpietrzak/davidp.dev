@@ -10,7 +10,7 @@ import { IoIosApps } from 'react-icons/io'
 import { RiSettings3Line, RiAccountBoxLine } from 'react-icons/ri'
 import { flushSync } from 'react-dom'
 
-import { useApps } from '@/os/apps'
+import { useAppsAvailable, useAppsRunning, useAppsWindows } from '@/os/apps'
 import { ControllerButton } from '@/os/controller/Controller/ControllerButton'
 import { Menu, MenuItem } from '@/os/controller/Controller/Menu'
 import { ControllerBiLocation, ControllerOptions } from '@/os/controller/Controller/types'
@@ -22,7 +22,9 @@ const locationsArray: ControllerOptions['location'][] = ['right', 'left', 'top',
 
 export const Controller = () => {
   const system = useSystem()
-  const apps = useApps()
+  const appsAvailable = useAppsAvailable()
+  const appsWindows = useAppsWindows()
+  const appsRunning = useAppsRunning()
   const { x, y } = useMousePosition()
   const { width, height } = useWindowSize()
   
@@ -142,19 +144,26 @@ export const Controller = () => {
         setLocation(locationsArray[temp])
       },
     }],
-    apps: apps.avail.menu.map((app) => ({
+    apps: appsAvailable.array.map((app) => ({
       icon: '',
       title: app.title,
       menuId: app.appId,
       onClick: () => {
-        apps.running.open({
+        appsRunning.open({
           appId: app.appId,
           title: app.title,
           multiInstance: app.multiInstance,
         })
       },
     })),
-    windows: []
+    windows: appsRunning.array.map((app) => ({
+      icon: '',
+      title: `${app.appId}-${app.instanceId}`,
+      menuId: `${app.appId}-${app.instanceId}`,
+      onClick: () => {
+        console.log(appsRunning)
+      }
+    }))
   }
 
   useEffect(() => {

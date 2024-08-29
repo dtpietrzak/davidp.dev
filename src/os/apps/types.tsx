@@ -27,15 +27,43 @@ export type Application = {
   app: AppComponent
 }
 
+/**
+ * the apps that are available for the user to "run"
+ * 
+ * should never change dynamically / is hard coded
+ *  * // currently also controls menu index
+ */
 export type AppAvail = Application & {
-  sync: boolean
-  index: number
+  menuIndex: number
 }
 export type AppsAvail = Record<string, AppAvail>
 
+/**
+ * localStorage state of all apps, running and/or closed, and their stored window states
+ * 
+ * should always persist to localStorage on changes
+ */
+export type AppWindow = {
+  appId: string
+  instanceId: number
+  width: number
+  height: number
+  x: number
+  y: number
+  zIndex: number
+  open: boolean
+  appData: Record<string, any>
+}
+export type AppsWindows = Record<string, AppWindow>
+
+
+/**
+ * in-memory state of all running apps
+ * 
+ * should never touch persistence
+ */
 export type AppRunning = {
   menuIndex: number
-  windowIndex: number
   appId: string
   instanceId: number
   uaiid: string
@@ -44,3 +72,11 @@ export type AppRunning = {
 }
 
 export type AppsRunning = Record<string, AppRunning>
+
+
+export type WindowLocation = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}

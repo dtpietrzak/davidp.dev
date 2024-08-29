@@ -1,6 +1,6 @@
 'use client'
 
-import { useApps } from '@/os/apps'
+import { useAppsAvailable, useAppsRunning, useAppsWindows } from '@/os/apps'
 import { RenderApp, Window } from '@/os/apps'
 import { AppRunning } from '@/os/apps/types'
 import { useSystem } from '@/os/system'
@@ -9,20 +9,25 @@ import { FileExplorer } from '@/apps/FileExplorer/FileExplorer'
 
 export default function Desktop() {
   const system = useSystem()
-  const apps = useApps()
+  const appsAvailable = useAppsAvailable()
+  const appsWindows = useAppsWindows()
+  const appsRunning = useAppsRunning()
 
   return (
     <main id="main">
       {
-        apps.running.windows.map((app: AppRunning) => {
+        appsRunning.array.map((app: AppRunning) => {
           return (
             <Window
               key={app.uaiid}
               uaiid={app.uaiid}
+              userId={system.data.user.userId}
+              appId={app.appId}
+              instanceId={app.instanceId}
               title={app.title}
             >
               {
-                apps.avail.object[app.appId].app({
+                appsAvailable.object[app.appId].app({
                   controlBarLocation: system.data.settings.controlBarLocation,
                   theme: system.data.settings.theme,
                   userId: system.data.user.userId,
