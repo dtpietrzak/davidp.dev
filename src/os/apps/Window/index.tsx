@@ -270,7 +270,7 @@ export const Window: FC<WindowProps> = ({
   }
 
   return (
-    <div className={`${isDragging ? 'text-gray-900 dark:text-gray-100 grayscale-20 opacity-90' : 'text-gray-700 dark:text-gray-300'} ${isResizing ? 'text-gray-800 dark:text-gray-100 grayscale-20 opacity-90' : 'text-gray-700 dark:text-gray-300'} absolute bg-gray-600/50 rounded-xl backdrop-blur-md shadow-lg !select-none border border-gray-500/50`}
+    <div className={`${isDragging ? 'text-gray-900 dark:text-gray-100 grayscale-20 opacity-90' : 'text-gray-700 dark:text-gray-300'} ${isResizing ? 'text-gray-800 dark:text-gray-100 grayscale-20 opacity-90' : 'text-gray-700 dark:text-gray-300'} absolute bg-gray-400/30 dark:bg-gray-600/30 rounded-xl backdrop-blur-xl shadow-lg !select-none border border-gray-500/50`}
       style={{
         top: _y,
         left: _x,
