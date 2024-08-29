@@ -285,7 +285,7 @@ export const Window: FC<WindowProps> = ({
       }}
     >
       <DragBar 
-        title={`${title} - ${currentApp.zIndex}`}
+        title={title}
         uaiid={uaiid}
         isDragging={isDragging}
         onChangeIsDragging={(value) => setIsDragging(value)}
