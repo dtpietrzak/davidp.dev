@@ -95,7 +95,7 @@ export const ScrollBarBox: FC<ScrollBarBoxProps> = ({
     >
       <div 
         className={`absolute right-0 w-[7px] rounded-md border border-gray-500/50 hover:bg-gray-500 ${
-          scrolling ? 'bg-gray-500' : 'bg-gray-500/30'
+          scrolling ? 'bg-gray-500' : `bg-gray-500/30 ${scrollThumbHeight < 5 ? 'hidden' : ''}`
         }`}
         style={{
           top: scrollFromTop + 10,
