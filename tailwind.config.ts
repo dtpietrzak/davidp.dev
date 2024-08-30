@@ -20,6 +20,12 @@ const config: Config = {
       grayscale: {
         20: '20%',
       },
+      dropShadow: {
+        glow: [
+          '0 0px 20px rgba(255,255, 255, 0.5)',
+          '0 0px 65px rgba(255, 255,255, 0.2)'
+        ]
+      }
     },
     fontSize: {
       xxs: '0.5rem',

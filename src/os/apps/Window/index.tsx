@@ -14,6 +14,9 @@ import { useImmer } from 'use-immer'
 import { useDebounceEffect } from 'ahooks'
 import { AppWindow } from '@/os/apps/types'
 
+import { AiOutlineFullscreen } from 'react-icons/ai'
+import { BsArrowBarLeft, BsArrowBarRight, BsArrowBarUp, BsArrowBarDown } from 'react-icons/bs'
+
 // there is a bug in the dragging on mobile code, that caused the touchSelectedDrag to flash false/true/false at the end of a legitimate drag
 
 const minWidth = 240
@@ -49,6 +52,9 @@ type WindowProps = {
   title: string
   children: React.ReactNode
 }
+
+type AutoResizerPositions = 'fullscreen' | 'half-left' | 'half-right' | 'half-top' | 'half-bottom'
+
 
 const locationMultiInstanceHandler = (currentApp: AppWindow) => {
   // if (currentApp.multiInstance) {
@@ -91,20 +97,21 @@ export const Window: FC<WindowProps> = ({
 
   const openedLocation = locationMultiInstanceHandler(currentApp)
 
-  const [_x, setX] = useState(openedLocation.x)
-  const _setX = (x: number) => setX(clampX(x, window?.innerWidth ?? 0))
-  const [_y, setY] = useState(openedLocation.y)
-  const _setY = (y: number) => setY(clampY(y, window?.innerHeight ?? 0))
-  const [_width, setWidth] = useState(openedLocation.width)
-  const _setWidth = (width: number) => setWidth(clampWidth(width))
-  const [_height, setHeight] = useState(openedLocation.height)
-  const _setHeight = (height: number) => setHeight(clampHeight(height))
+  const [_x, __setX] = useState(openedLocation.x)
+  const _setX = (x: number) => __setX(clampX(x, window?.innerWidth ?? 0))
+  const [_y, __setY] = useState(openedLocation.y)
+  const _setY = (y: number) => __setY(clampY(y, window?.innerHeight ?? 0))
+  const [_width, __setWidth] = useState(openedLocation.width)
+  const _setWidth = (width: number) => __setWidth(clampWidth(width))
+  const [_height, __setHeight] = useState(openedLocation.height)
+  const _setHeight = (height: number) => __setHeight(clampHeight(height))
 
   const [isDragging, setIsDragging] = useState(false)
   useEffect(() => {
     if (isDragging) {
       document.body.classList.add('no-select')
     } else {
+      setIsHoveringAutoResizer(null)
       document.body.classList.remove('no-select')
     }
   }, [isDragging])
@@ -116,6 +123,7 @@ export const Window: FC<WindowProps> = ({
       document.body.classList.remove('no-select')
     }
   }, [isResizing])
+  const [isHoveringAutoResizer, setIsHoveringAutoResizer] = useState<AutoResizerPositions | null>(null)
 
   const [initialX, setInitialX] = useState(_x)
   const [initialY, setInitialY] = useState(_y)
@@ -269,69 +277,144 @@ export const Window: FC<WindowProps> = ({
     setInitialHeight(_height)
   }
 
+
+  const handleAutoResizerMouseEnter = (position: AutoResizerPositions) => {
+    setIsHoveringAutoResizer(position)
+  }
+
+  const handleAutoResizerMouseUp = (position: AutoResizerPositions) => {
+    switch (position) {
+      case 'fullscreen':
+        _setX(0)
+        _setY(0)
+        _setWidth(window.innerWidth)
+        _setHeight(window.innerHeight)
+        break
+      case 'half-left':
+        _setX(0)
+        _setY(0)
+        _setWidth(window.innerWidth / 2)
+        _setHeight(window.innerHeight)
+        break
+      case 'half-right':
+        _setX(window.innerWidth / 2)
+        _setY(0)
+        _setWidth(window.innerWidth / 2)
+        _setHeight(window.innerHeight)
+        break
+      case 'half-top':
+        _setX(0)
+        _setY(0)
+        _setWidth(window.innerWidth)
+        _setHeight(window.innerHeight / 2)
+        break
+      case 'half-bottom':
+        _setX(0)
+        _setY(window.innerHeight / 2)
+        _setWidth(window.innerWidth)
+        _setHeight(window.innerHeight / 2)
+        break
+    }
+  }
+
   return (
-    <div className={`${isDragging ? 'text-gray-900 dark:text-gray-100 grayscale-20 opacity-90' : 'text-gray-700 dark:text-gray-300'} ${isResizing ? 'text-gray-800 dark:text-gray-100 grayscale-20 opacity-90' : 'text-gray-700 dark:text-gray-300'} absolute bg-gray-400/30 dark:bg-gray-600/30 rounded-xl backdrop-blur-xl shadow-lg !select-none border border-gray-500/50`}
-      style={{
-        top: _y,
-        left: _x,
-        width: _width,
-        height: _height,
-        minHeight: minHeight,
-        minWidth: minWidth,
-        zIndex: currentApp.zIndex + 1000,
-      }}
-      onMouseDown={() => {
-        appsWindows.focus(uaiid)
-      }}
-    >
-      <DragBar 
-        title={title}
-        uaiid={uaiid}
-        isDragging={isDragging}
-        onChangeIsDragging={(value) => setIsDragging(value)}
-        mouseSelectedDrag={mouseSelectedDrag}
-        onChangeMouseSelectedDrag={(value) => setMouseSelectedDrag(value)}
-        touchSelectedDrag={touchSelectedDrag}
-        onChangeTouchSelectedDrag={(value) => setTouchSelectedDrag(value)}
-        onCaptureInitialCoords={(value) => captureInitialCoords(value)}
-      />
-      <ResizeButton 
-        resizeDirection='ne'
-        isResizing={isResizing}
-        onChangeIsResizing={(value) => setIsResizing(value)}
-        touchSelectedResize={touchSelectedResize}
-        onChangeTouchSelectedResize={(value) => setTouchSelectedResize(value)}
-        onCaptureInitialCoords={(value) => captureInitialCoords(value)}
-      />
-      <ResizeButton 
-        resizeDirection='nw'
-        isResizing={isResizing}
-        onChangeIsResizing={(value) => setIsResizing(value)}
-        touchSelectedResize={touchSelectedResize}
-        onChangeTouchSelectedResize={(value) => setTouchSelectedResize(value)}
-        onCaptureInitialCoords={(value) => captureInitialCoords(value)}
-      />
-      <ResizeButton 
-        resizeDirection='se'
-        isResizing={isResizing}
-        onChangeIsResizing={(value) => setIsResizing(value)}
-        touchSelectedResize={touchSelectedResize}
-        onChangeTouchSelectedResize={(value) => setTouchSelectedResize(value)}
-        onCaptureInitialCoords={(value) => captureInitialCoords(value)}
-      />
-      <ResizeButton 
-        resizeDirection='sw'
-        isResizing={isResizing}
-        onChangeIsResizing={(value) => setIsResizing(value)}
-        touchSelectedResize={touchSelectedResize}
-        onChangeTouchSelectedResize={(value) => setTouchSelectedResize(value)}
-        onCaptureInitialCoords={(value) => captureInitialCoords(value)}
-      />
-      <div className="w-full h-[calc(100%-19px)] overflow-hidden">
-        <ScrollBarBox>
-          {children}
-        </ScrollBarBox>
+    <>
+      <div className={`absolute top-0 transition-all duration-300 left-0 z-4000 w-full ${isDragging ? 'opacity-100' : 'opacity-0'}`}>
+        {
+          isDragging && (
+            <div className='flex w-full h-5 justify-evenly items-center'>
+              <div className={`${baseAutoResizerClass} ${isHoveringAutoResizer === 'half-left' ? 'opacity-100 shadow-xl drop-shadow-glow' : 'opacity-50 shadow'}`}
+                onMouseEnter={() => handleAutoResizerMouseEnter('half-left')}
+                onMouseUp={() => handleAutoResizerMouseUp('half-left')}
+                onMouseLeave={() => setIsHoveringAutoResizer(null)}
+              >
+                <BsArrowBarLeft />
+              </div>
+              <div className={`${baseAutoResizerClass} ${isHoveringAutoResizer === 'fullscreen' ? 'opacity-100 shadow-xl drop-shadow-glow' : 'opacity-50 shadow'}`}
+                onMouseEnter={() => handleAutoResizerMouseEnter('fullscreen')}
+                onMouseUp={() => handleAutoResizerMouseUp('fullscreen')}
+                onMouseLeave={() => setIsHoveringAutoResizer(null)}
+              >
+                <AiOutlineFullscreen />
+              </div>
+              <div className={`${baseAutoResizerClass} ${isHoveringAutoResizer === 'half-right' ? 'opacity-100 shadow-xl drop-shadow-glow' : 'opacity-50 shadow'}`}
+                onMouseEnter={() => handleAutoResizerMouseEnter('half-right')}
+                onMouseUp={() => handleAutoResizerMouseUp('half-right')}
+                onMouseLeave={() => setIsHoveringAutoResizer(null)}
+              >
+                <BsArrowBarRight />
+              </div>
+            </div>
+          )
+        }
       </div>
-    </div>
+    
+      <div className={`${isDragging ? 'text-gray-900 dark:text-gray-100 grayscale-20 opacity-90' : 'text-gray-700 dark:text-gray-300'} ${isResizing ? 'text-gray-800 dark:text-gray-100 grayscale-20 opacity-90' : 'text-gray-700 dark:text-gray-300'} absolute bg-gray-400/30 dark:bg-gray-600/30 rounded-xl backdrop-blur-xl shadow-lg !select-none border border-gray-500/50`}
+        style={{
+          top: _y,
+          left: _x,
+          width: _width,
+          height: _height,
+          minHeight: minHeight,
+          minWidth: minWidth,
+          zIndex: currentApp.zIndex + 1000,
+        }}
+        onMouseDown={() => {
+          appsWindows.focus(uaiid)
+        }}
+      >
+        <DragBar 
+          title={title}
+          uaiid={uaiid}
+          isDragging={isDragging}
+          onChangeIsDragging={(value) => setIsDragging(value)}
+          mouseSelectedDrag={mouseSelectedDrag}
+          onChangeMouseSelectedDrag={(value) => setMouseSelectedDrag(value)}
+          touchSelectedDrag={touchSelectedDrag}
+          onChangeTouchSelectedDrag={(value) => setTouchSelectedDrag(value)}
+          onCaptureInitialCoords={(value) => captureInitialCoords(value)}
+        />
+        <ResizeButton 
+          resizeDirection='ne'
+          isResizing={isResizing}
+          onChangeIsResizing={(value) => setIsResizing(value)}
+          touchSelectedResize={touchSelectedResize}
+          onChangeTouchSelectedResize={(value) => setTouchSelectedResize(value)}
+          onCaptureInitialCoords={(value) => captureInitialCoords(value)}
+        />
+        <ResizeButton 
+          resizeDirection='nw'
+          isResizing={isResizing}
+          onChangeIsResizing={(value) => setIsResizing(value)}
+          touchSelectedResize={touchSelectedResize}
+          onChangeTouchSelectedResize={(value) => setTouchSelectedResize(value)}
+          onCaptureInitialCoords={(value) => captureInitialCoords(value)}
+        />
+        <ResizeButton 
+          resizeDirection='se'
+          isResizing={isResizing}
+          onChangeIsResizing={(value) => setIsResizing(value)}
+          touchSelectedResize={touchSelectedResize}
+          onChangeTouchSelectedResize={(value) => setTouchSelectedResize(value)}
+          onCaptureInitialCoords={(value) => captureInitialCoords(value)}
+        />
+        <ResizeButton 
+          resizeDirection='sw'
+          isResizing={isResizing}
+          onChangeIsResizing={(value) => setIsResizing(value)}
+          touchSelectedResize={touchSelectedResize}
+          onChangeTouchSelectedResize={(value) => setTouchSelectedResize(value)}
+          onCaptureInitialCoords={(value) => captureInitialCoords(value)}
+        />
+        <div className="w-full h-[calc(100%-19px)] overflow-hidden">
+          <ScrollBarBox>
+            {children}
+          </ScrollBarBox>
+        </div>
+      </div>
+    </>
   )
 }
+
+
+const baseAutoResizerClass = 'text-gray-800 dark:text-gray-100 w-8 h-full flex justify-center items-start bg-gray-400/30 dark:bg-gray-600/30 rounded-b-xl backdrop-blur-xl !select-none border border-gray-500/50 cursor-move'
