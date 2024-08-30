@@ -1,12 +1,18 @@
 'use client'
 
-import { createContext, useContext, useMemo, useState } from 'react'
+import { createContext, use, useContext, useMemo, useState } from 'react'
 import { Controller } from '@/os/controller/Controller'
 import { ControllerOptions } from '@/os/controller/Controller/types'
 import { useWindowSize } from 'react-use'
 
 const ControllerContext = createContext({
-  
+  size: {
+    sliding: { width: 0, height: 0, x: 0, y: 0 },
+    max: { width: 0, height: 0, x: 0, y: 0 },
+    min: { width: 0, height: 0, x: 0, y: 0 },
+  },
+  location: 'right' as ControllerOptions['location'],
+  theme: 'dark' as ControllerOptions['theme'],
 })
 
 type ControllerProviderProps = {

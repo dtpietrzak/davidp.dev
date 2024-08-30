@@ -15,7 +15,8 @@ import { useDebounceEffect } from 'ahooks'
 import { AppWindow } from '@/os/apps/types'
 
 import { AiOutlineFullscreen } from 'react-icons/ai'
-import { BsArrowBarLeft, BsArrowBarRight, BsArrowBarUp, BsArrowBarDown } from 'react-icons/bs'
+import { BsArrowBarLeft, BsArrowBarRight, BsArrowBarUp, BsArrowBarDown, BsArrowsFullscreen, BsArrowsAngleContract } from 'react-icons/bs'
+import { useController } from '@/os/controller'
 
 // there is a bug in the dragging on mobile code, that caused the touchSelectedDrag to flash false/true/false at the end of a legitimate drag
 
@@ -53,7 +54,7 @@ type WindowProps = {
   children: React.ReactNode
 }
 
-type AutoResizerPositions = 'fullscreen' | 'half-left' | 'half-right' | 'half-top' | 'half-bottom'
+type AutoResizerPositions = 'fullscreen' | 'collapse' | 'half-left' | 'half-right' | 'half-top' | 'half-bottom'
 
 
 const locationMultiInstanceHandler = (currentApp: AppWindow) => {
@@ -89,6 +90,7 @@ export const Window: FC<WindowProps> = ({
   title,
   children, 
 }) => {
+  const controller = useController()
   const appsWindows = useAppsWindows()
   const [currentApp, setCurrentApp] = useImmer(appsWindows.object[uaiid])
   useEffect(() => {
@@ -285,64 +287,134 @@ export const Window: FC<WindowProps> = ({
   const handleAutoResizerMouseUp = (position: AutoResizerPositions) => {
     switch (position) {
       case 'fullscreen':
-        _setX(0)
-        _setY(0)
-        _setWidth(window.innerWidth)
-        _setHeight(window.innerHeight)
+        _setX(controller.size.max.x)
+        _setY(controller.size.max.y)
+        _setWidth(controller.size.max.width)
+        _setHeight(controller.size.max.height - 12)
+        break
+      case 'collapse':
+        _setX(controller.size.max.x)
+        _setY(controller.size.max.y)
+        _setWidth((controller.size.max.width) / 2)
+        _setHeight((controller.size.max.height - 12) / 2)
         break
       case 'half-left':
-        _setX(0)
-        _setY(0)
-        _setWidth(window.innerWidth / 2)
-        _setHeight(window.innerHeight)
+        _setX(controller.size.max.x)
+        _setY(controller.size.max.y)
+        _setWidth(controller.size.max.width / 2)
+        _setHeight(controller.size.max.height - 12)
         break
       case 'half-right':
-        _setX(window.innerWidth / 2)
-        _setY(0)
-        _setWidth(window.innerWidth / 2)
-        _setHeight(window.innerHeight)
+        _setX(controller.size.max.width / 2)
+        _setY(controller.size.max.y)
+        _setWidth(controller.size.max.width / 2)
+        _setHeight(controller.size.max.height - 12)
         break
       case 'half-top':
-        _setX(0)
-        _setY(0)
-        _setWidth(window.innerWidth)
-        _setHeight(window.innerHeight / 2)
+        _setX(controller.size.max.x)
+        _setY(controller.size.max.y)
+        _setWidth(controller.size.max.width)
+        _setHeight((controller.size.max.height - 12) / 2)
         break
       case 'half-bottom':
-        _setX(0)
-        _setY(window.innerHeight / 2)
-        _setWidth(window.innerWidth)
-        _setHeight(window.innerHeight / 2)
+        _setX(controller.size.max.x)
+        _setY(controller.size.max.y / 2)
+        _setWidth(controller.size.max.width)
+        _setHeight((controller.size.max.height - 12) / 2)
         break
     }
   }
 
   return (
     <>
-      <div className={`absolute top-0 transition-all duration-300 left-0 z-4000 w-full ${isDragging ? 'opacity-100' : 'opacity-0'}`}>
+      <div 
+        className={`absolute transition-all duration-300 z-4000 w-full ${isDragging ? 'opacity-100' : 'opacity-0'}`}
+        style={
+          controller.location === 'top' ? {
+            bottom: 0,
+            left: 0,
+          } : controller.location === 'bottom' ? {
+            top: 0,
+            left: 0,
+          } : controller.location === 'left' ? {
+            top: 0,
+            right: 0,
+          } : controller.location === 'right' ? {
+            top: 0,
+            left: 0,
+          } : {}
+        }
+      >
         {
           isDragging && (
             <div className='flex w-full h-5 justify-evenly items-center'>
-              <div className={`${baseAutoResizerClass} ${isHoveringAutoResizer === 'half-left' ? 'opacity-100 shadow-xl drop-shadow-glow' : 'opacity-50 shadow'}`}
+              <div className={`${baseAutoResizerClassHorizontal} ${isHoveringAutoResizer === 'half-left' ? 'opacity-100 shadow-xl drop-shadow-glow' : 'opacity-50 shadow'}`}
                 onMouseEnter={() => handleAutoResizerMouseEnter('half-left')}
                 onMouseUp={() => handleAutoResizerMouseUp('half-left')}
                 onMouseLeave={() => setIsHoveringAutoResizer(null)}
               >
                 <BsArrowBarLeft />
               </div>
-              <div className={`${baseAutoResizerClass} ${isHoveringAutoResizer === 'fullscreen' ? 'opacity-100 shadow-xl drop-shadow-glow' : 'opacity-50 shadow'}`}
+              <div className={`${baseAutoResizerClassHorizontal} ${isHoveringAutoResizer === 'fullscreen' ? 'opacity-100 shadow-xl drop-shadow-glow' : 'opacity-50 shadow'}`}
                 onMouseEnter={() => handleAutoResizerMouseEnter('fullscreen')}
                 onMouseUp={() => handleAutoResizerMouseUp('fullscreen')}
                 onMouseLeave={() => setIsHoveringAutoResizer(null)}
               >
-                <AiOutlineFullscreen />
+                <BsArrowsFullscreen />
               </div>
-              <div className={`${baseAutoResizerClass} ${isHoveringAutoResizer === 'half-right' ? 'opacity-100 shadow-xl drop-shadow-glow' : 'opacity-50 shadow'}`}
+              <div className={`${baseAutoResizerClassHorizontal} ${isHoveringAutoResizer === 'half-right' ? 'opacity-100 shadow-xl drop-shadow-glow' : 'opacity-50 shadow'}`}
                 onMouseEnter={() => handleAutoResizerMouseEnter('half-right')}
                 onMouseUp={() => handleAutoResizerMouseUp('half-right')}
                 onMouseLeave={() => setIsHoveringAutoResizer(null)}
               >
                 <BsArrowBarRight />
+              </div>
+            </div>
+          )
+        }
+      </div>
+
+      <div 
+        className={`absolute transition-all duration-300 z-4000 h-full ${isDragging ? 'opacity-100' : 'opacity-0'}`}
+        style={
+          controller.location === 'top' ? {
+            bottom: 0,
+            left: 0,
+          } : controller.location === 'bottom' ? {
+            top: 0,
+            left: 0,
+          } : controller.location === 'left' ? {
+            top: 0,
+            right: 0,
+          } : controller.location === 'right' ? {
+            top: 0,
+            left: 0,
+          } : {}
+        }
+      >
+        {
+          isDragging && (
+            <div className='flex flex-col h-full w-5 justify-evenly items-center'>
+              <div className={`${baseAutoResizerClassVertical} ${isHoveringAutoResizer === 'half-top' ? 'opacity-100 shadow-xl drop-shadow-glow' : 'opacity-50 shadow'}`}
+                onMouseEnter={() => handleAutoResizerMouseEnter('half-top')}
+                onMouseUp={() => handleAutoResizerMouseUp('half-top')}
+                onMouseLeave={() => setIsHoveringAutoResizer(null)}
+              >
+                <BsArrowBarUp />
+              </div>
+              <div className={`${baseAutoResizerClassVertical} ${isHoveringAutoResizer === 'collapse' ? 'opacity-100 shadow-xl drop-shadow-glow' : 'opacity-50 shadow'}`}
+                onMouseEnter={() => handleAutoResizerMouseEnter('collapse')}
+                onMouseUp={() => handleAutoResizerMouseUp('collapse')}
+                onMouseLeave={() => setIsHoveringAutoResizer(null)}
+              >
+                <BsArrowsAngleContract />
+              </div>
+              <div className={`${baseAutoResizerClassVertical} ${isHoveringAutoResizer === 'half-bottom' ? 'opacity-100 shadow-xl drop-shadow-glow' : 'opacity-50 shadow'}`}
+                onMouseEnter={() => handleAutoResizerMouseEnter('half-bottom')}
+                onMouseUp={() => handleAutoResizerMouseUp('half-bottom')}
+                onMouseLeave={() => setIsHoveringAutoResizer(null)}
+              >
+                <BsArrowBarDown />
               </div>
             </div>
           )
@@ -417,4 +489,6 @@ export const Window: FC<WindowProps> = ({
 }
 
 
-const baseAutoResizerClass = 'text-gray-800 dark:text-gray-100 w-8 h-full flex justify-center items-start bg-gray-400/30 dark:bg-gray-600/30 rounded-b-xl backdrop-blur-xl !select-none border border-gray-500/50 cursor-move'
+const baseAutoResizerClassHorizontal = 'text-gray-800 dark:text-gray-100 w-8 h-full flex justify-center items-center bg-gray-400/30 dark:bg-gray-600/30 rounded-xl backdrop-blur-xl !select-none border border-gray-500/50 cursor-move'
+
+const baseAutoResizerClassVertical = 'text-gray-800 dark:text-gray-100 h-8 w-full flex justify-center items-center bg-gray-400/30 dark:bg-gray-600/30 rounded-xl backdrop-blur-xl !select-none border border-gray-500/50 cursor-move'
