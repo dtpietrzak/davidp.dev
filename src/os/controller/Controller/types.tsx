@@ -7,4 +7,5 @@ export type ControllerLocation = VerticalLocation | HorizontalLocation
 
 export type ControllerOptions = {
   location: ControllerLocation
+  theme: 'light' | 'dark'
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { FC, useCallback, useEffect, useRef, useState } from 'react'
 import { useClickAway, useWindowSize } from 'react-use'
 import { useMousePosition } from '@/hooks/useMousePosition'
 
@@ -18,25 +18,44 @@ import { useSystem } from '@/os/system'
 
 let timeInControllerHitbox = 0
 
-const locationsArray: ControllerOptions['location'][] = ['right', 'left', 'top', 'bottom']
+type ControllerProps = {
+  focused: boolean
+  onChangeFocused: (focused: boolean) => void
 
-export const Controller = () => {
+  location: ControllerOptions['location']
+  onChangeLocation: (location: ControllerOptions['location']) => void
+  theme: ControllerOptions['theme']
+  onToggleTheme: () => void
+
+  width: number
+  height: number
+}
+
+export const Controller: FC<ControllerProps> = ({
+  focused: controllerFocused,
+  onChangeFocused: onChangeControllerFocused,
+
+  location,
+  onChangeLocation,
+  theme,
+  onToggleTheme,
+
+  width,
+  height,
+}) => {
   const system = useSystem()
   const appsAvailable = useAppsAvailable()
   const appsWindows = useAppsWindows()
   const appsRunning = useAppsRunning()
   const { x, y } = useMousePosition()
-  const { width, height } = useWindowSize()
   
   const [mouseInControlHandle, setMouseInControlHandle] = useState(false)
   const [mouseInController, setMouseInController] = useState(false)
   const [mouseInMenu, setMouseInMenu] = useState(false)
 
-  const [controllerFocused, setControllerFocused] = useState(false)
   const [shouldTransition, setShouldTransition] = useState(false)
-  const [temp, setTemp] = useState(0)
-  const [location, setLocation] = 
-    useState<ControllerOptions['location']>(locationsArray[temp])
+  
+  const [selectedChangeLocation, setSelectedChangeLocation] = useState(false)
 
   const [menuDirection, setMenuDirection] = 
     useState<ControllerBiLocation | null>(null)
@@ -47,13 +66,79 @@ export const Controller = () => {
   useClickAway(clickAwayRef, () => {
     if (controllerFocused && (
       location === 'top' && y > 52 ||
-        location === 'bottom' && y < height - 52 ||
-        location === 'left' && x > 52 ||
-        location === 'right' && x < width - 52
+      location === 'bottom' && y < height - 52 ||
+      location === 'left' && x > 52 ||
+      location === 'right' && x < width - 52
     )) {
       setTimeout(() => { closeController() }, 200)
     }
-  })
+  }, ['onClick', 'onMouseDown', 'onMouseOver', 'onMouseOut', 'onTouchStart', 'onTouchEnd', 'onTouchMove']) // overkill?
+
+  const defaultSettingsMenu = [{
+    icon: '',
+    title: theme === 'dark' ? 'Change To Light Theme' : 'Change To Dark Theme',
+    menuId: 'light-dark-theme',
+    onClick: () => {
+      onToggleTheme()
+    },
+  },{
+    icon: '',
+    title: 'Control Bar Location',
+    menuId: 'control-bar-location',
+    onClick: () => {
+      setSelectedChangeLocation(true)
+    },
+  }]
+
+  const changeLocationSettingsMenu = [{
+    icon: '',
+    title: 'Top',
+    menuId: 'top',
+    onClick: () => {
+      flushSync(() => {
+        closeController()
+        setShouldTransition(false)
+      })
+      onChangeLocation('top')
+      setSelectedChangeLocation(false)
+    },
+  },{
+    icon: '',
+    title: 'Bottom',
+    menuId: 'bottom',
+    onClick: () => {
+      flushSync(() => {
+        closeController()
+        setShouldTransition(false)
+      })
+      onChangeLocation('bottom')
+      setSelectedChangeLocation(false)
+    },
+  },{
+    icon: '',
+    title: 'Left',
+    menuId: 'left',
+    onClick: () => {
+      flushSync(() => {
+        closeController()
+        setShouldTransition(false)
+      })
+      onChangeLocation('left')
+      setSelectedChangeLocation(false)
+    },
+  },{
+    icon: '',
+    title: 'Right',
+    menuId: 'right',
+    onClick: () => {
+      flushSync(() => {
+        closeController()
+        setShouldTransition(false)
+      })
+      onChangeLocation('right')
+      setSelectedChangeLocation(false)
+    },
+  }].filter((item) => item.menuId !== location)
 
   const menuItems: Record<string, MenuItem[]> = {
     none: [],
@@ -108,42 +193,12 @@ export const Controller = () => {
         system.login({ userId: 'DavidP', name: 'David' })
       },
     }],
-    settings: [{
-      icon: '',
-      title: 'Light / Dark Theme',
-      menuId: 'light-dark-theme',
-      onClick: () => {
-        const theme = localStorage.getItem('theme')
-        if (theme) {
-          if (theme === 'dark') {
-            localStorage.setItem('theme', 'light')
-            document.documentElement.classList.remove('dark')
-            document.body.style.setProperty('background', '#FFF')
-          } else {
-            localStorage.setItem('theme', 'dark')
-            document.documentElement.classList.add('dark')
-            document.body.style.setProperty('background', '#000')
-          }
-        } else {
-          document.documentElement.classList.remove('dark')
-          document.body.style.setProperty('background', '#FFF')
-        }
-      },
-    },{
-      icon: '',
-      title: 'Control Bar Location',
-      menuId: 'control-bar-location',
-      onClick: () => {
-        flushSync(() => {
-          closeController()
-          setShouldTransition(false)
-        })
-        setTemp((prev) => {
-          return prev === 3 ? 0 : (prev + 1)
-        })
-        setLocation(locationsArray[temp])
-      },
-    }],
+    settings: (
+      selectedChangeLocation ? 
+        changeLocationSettingsMenu 
+        : 
+        defaultSettingsMenu
+    ),
     apps: appsAvailable.array.map((app) => ({
       icon: '',
       title: app.title,
@@ -173,16 +228,17 @@ export const Controller = () => {
 
   const closeController = useCallback(() => {
     timeInControllerHitbox = 0
-    setControllerFocused(false)
+    onChangeControllerFocused(false)
     setMouseInControlHandle(false)
     setMouseInController(false)
     setMouseInMenu(false)
     setMenuDirection(null)
-  }, [])
+    setSelectedChangeLocation(false)
+  }, [onChangeControllerFocused])
 
   const controlButtonClicked = () => {
     setMouseInController(true)
-    setControllerFocused(true)
+    onChangeControllerFocused(true)
   }
 
   const handleControllerFocused = useCallback((
@@ -192,22 +248,22 @@ export const Controller = () => {
     if (!controllerFocused) {
       if (_mouseInside) {
         timeInControllerHitbox = 5
-        setControllerFocused(true)
+        onChangeControllerFocused(true)
       } else if ((relativeMousePosition >= 0 && relativeMousePosition < 10)) {
-        if (timeInControllerHitbox > 5) setControllerFocused(true)
+        if (timeInControllerHitbox > 5) onChangeControllerFocused(true)
         else timeInControllerHitbox++
       } else {
         closeController()
       }
     } else {
       if ((relativeMousePosition >= 0 && relativeMousePosition < 52) || _mouseInside) {
-        if (timeInControllerHitbox > 5) setControllerFocused(true)
+        if (timeInControllerHitbox > 5) onChangeControllerFocused(true)
         else timeInControllerHitbox++
       } else {
         closeController()
       }
     }
-  }, [closeController, controllerFocused])
+  }, [closeController, controllerFocused, onChangeControllerFocused])
 
   const logicClockCallback = useCallback(() => {
     const mouseInside = mouseInControlHandle || mouseInController || mouseInMenu
@@ -362,7 +418,7 @@ export const Controller = () => {
             setMenuSelected('windows')
           }
 
-          setControllerFocused(true)
+          onChangeControllerFocused(true)
         }}
       >
         {
